@@ -6,6 +6,7 @@ import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import org.bukkit.entity.Player
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.scheduler.BukkitRunnable
 import top.eternal.neyran.movementUI.MovementsMain
 import kotlin.math.atan2
@@ -34,8 +35,8 @@ class ProtocolListener(private val plugin: MovementsMain) {
         if (state.navigationMode) {
             player.walkSpeed = 0.005f
             val currentTime = System.currentTimeMillis()
-
-            if (state.lastMoveTime != null && currentTime - state.lastMoveTime!! < 100) {
+            val delay = plugin.settingsConfig.getInt("detect-delay")
+            if (state.lastMoveTime != null && currentTime - state.lastMoveTime!! < delay) {
                 return
             }
 

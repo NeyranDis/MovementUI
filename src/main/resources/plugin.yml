@@ -1,5 +1,5 @@
 name: MovementUI
-version: '1.0.7'
+version: '1.0.7.1'
 main: top.eternal.neyran.movementUI.MovementsMain
 description: Plugin for creating navigation menus. Works great with BetterHud
 api-version: '1.20'

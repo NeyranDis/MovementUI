@@ -2,6 +2,7 @@ version: 1.0.7
 bStats: true
 debug: false
 default_menu: default
+detect-delay: 150
 air_fix: true
 bind-enable: true
 bind-command: false

@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MovementUI.iml" filepath="$PROJECT_DIR$/.idea/modules/MovementUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MovementUI.main.iml" filepath="$PROJECT_DIR$/.idea/modules/MovementUI.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MovementUI.test.iml" filepath="$PROJECT_DIR$/.idea/modules/MovementUI.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.main.iml" filepath="$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.test.iml" filepath="$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.test.iml" />
     </modules>
   </component>
 </project>
