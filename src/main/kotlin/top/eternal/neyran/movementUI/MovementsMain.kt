@@ -10,6 +10,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
+import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -128,41 +129,83 @@ class MovementsMain : JavaPlugin() {
 
             when (args[0].lowercase()) {
                 "startmenu" -> {
-                    if (sender is Player) {
+                    if (sender is Player || sender is ConsoleCommandSender) {
                         val menuName = args.getOrNull(1) ?: settingsConfig.getString("default_menu") ?: "default"
                         val targetPlayerName = args.getOrNull(2)
 
                         val targetPlayer = if (targetPlayerName != null) {
                             Bukkit.getPlayerExact(targetPlayerName)
+                        } else if (sender is Player) {
+                            sender
                         } else {
-                            if (sender is Player) sender else null
+                            null
                         }
 
-                        if (targetPlayer != null) {
-                            if (sender is Player && !sender.hasPermission("movementui.startmenu")) {
-                                val message = Component.text()
-                                    .append(
-                                        langConfig.getString("plugin.tag")?.toMiniMessageComponent()
-                                            ?: Component.text("")
-                                    )
-                                    .append(
-                                        langConfig.getString("no.permissions")?.toMiniMessageComponent()
-                                            ?: Component.text("")
-                                    )
-                                    .build()
-                                sender.sendMessage(message)
-                            } else {
-                                startNavigation(targetPlayer, menuName)
-                            }
+                        if (targetPlayer == null || !targetPlayer.isOnline) {
+                            sender.sendMessage(
+                                langConfig.getString("plugin.tag")?.toMiniMessageComponent()
+                                    ?.append(langConfig.getString("player.not.found")?.toMiniMessageComponent()
+                                        ?: Component.text(""))
+                                    ?: Component.text("")
+                            )
+                            return true
                         }
+
+                        if (sender is Player && !sender.hasPermission("movementui.startmenu")) {
+                            val message = Component.text()
+                                .append(
+                                    langConfig.getString("plugin.tag")?.toMiniMessageComponent()
+                                        ?: Component.text("")
+                                )
+                                .append(
+                                    langConfig.getString("no.permissions")?.toMiniMessageComponent()
+                                        ?: Component.text("")
+                                )
+                                .build()
+                            sender.sendMessage(message)
+                            return true
+                        }
+
+                        startNavigation(targetPlayer, menuName)
                     }
                 }
                 "closemenu" -> {
-                    if (sender is Player) {
-                        val player = sender
+                    val targetPlayerName = args.getOrNull(1)
 
-                        closeNavigation(player)
+                    val targetPlayer = if (targetPlayerName != null) {
+                        Bukkit.getPlayerExact(targetPlayerName)
+                    } else if (sender is Player) {
+                        sender
+                    } else {
+                        null
                     }
+
+                    if (targetPlayer == null || !targetPlayer.isOnline) {
+                        sender.sendMessage(
+                            langConfig.getString("plugin.tag")?.toMiniMessageComponent()
+                                ?.append(langConfig.getString("player.not.found")?.toMiniMessageComponent()
+                                    ?: Component.text(""))
+                                ?: Component.text("")
+                        )
+                        return true
+                    }
+
+                    if (sender is Player && !sender.hasPermission("movementui.closemenu")) {
+                        val message = Component.text()
+                            .append(
+                                langConfig.getString("plugin.tag")?.toMiniMessageComponent()
+                                    ?: Component.text("")
+                            )
+                            .append(
+                                langConfig.getString("no.permissions")?.toMiniMessageComponent()
+                                    ?: Component.text("")
+                            )
+                            .build()
+                        sender.sendMessage(message)
+                        return true
+                    }
+
+                    closeNavigation(targetPlayer)
                 }
 
                 "reload" -> {

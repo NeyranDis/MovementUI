@@ -6,6 +6,8 @@ no.permissions_menu: "You don't have permission for this menu!"
 navigation.enabled: "Navigation mode is already activated!"
 navigation.disabled: "Navigation mode is already disabled!"
 
+player.not.found: "Player not found!"
+
 debug.navigation.toggle_disable: "Navigation mode is disabled"
 debug.navigation.enter: "Navigation mode is on. You cannot move, but you can control coordinates using the keys. Menu: {menu}"
 debug.navigation.coordinates: "Navigation: {x} {y} {z}"
