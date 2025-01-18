@@ -350,7 +350,11 @@ class MovementsMain : JavaPlugin() {
                 state.x = prevX
                 state.y = prevY
                 state.z = prevZ
-                sendDebugMessage(player, "${langConfig.get("debug.navigation.permission_denied")}")
+                val message = (Component.text()
+                    .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
+                    .append(langConfig.getString("no.permissions_menu")?.toMiniMessageComponent() ?: Component.text(""))
+                    .build())
+                player.sendMessage(message)
                 return
             }
         }
