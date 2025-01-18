@@ -1,0 +1,18 @@
+plugin.tag: "&d[MovementUI] "
+
+reload.command: "Configs reloaded!"
+no.permissions: "You don't have permission to use this command!"
+no.permissions_menu: "You don't have permission for this menu!"
+navigation.enabled: "Navigation mode is already activated!"
+navigation.disabled: "Navigation mode is already disabled!"
+
+debug.navigation.toggle_disable: "Navigation mode is disabled"
+debug.navigation.enter: "Navigation mode is on. You cannot move, but you can control coordinates using the keys. Menu: {menu}"
+debug.navigation.coordinates: "Navigation: {x} {y} {z}"
+debug.navigation.banned_coords: "You cannot move to this point!"
+debug.navigation.menu_switch: "You have switched to menu: {menu}"
+debug.navigation.bind_activation: "Navigation mode enabled with menu: {menu}."
+debug.conditions.Condition_main: "Condition: {name}"
+debug.conditions.Condition: "First: {first}, Second: {second}, Operation: {operation}, Gate: {gate}"
+debug.conditions.Condition_result: "Comparison result: {result}. Final result: {finalResult}"
+debug.conditions.coord_condition_failed: "Coords Conditions Failures"

@@ -1,0 +1,11 @@
+bind_enter:
+  commands:
+    1:
+      command: "say Enter"
+      executeType: op
+
+bind_exit:
+  commands:
+    1:
+      command: "say Exit"
+      executeType: op

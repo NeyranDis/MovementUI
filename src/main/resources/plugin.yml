@@ -1,0 +1,26 @@
+name: MovementUI
+version: '1.0.6.2'
+main: top.eternal.neyran.movementUI.MovementsMain
+description: Plugin for creating navigation menus. Works great with BetterHud
+api-version: '1.20'
+authors: [ Neyran ]
+depend:
+  - PlaceholderAPI
+  - BetterHud
+  - ProtocolLib
+commands:
+  movementui:
+    description: Main command for movements plugin.
+    permission: movementui.use
+    aliases: [mui]
+permissions:
+  movementui.use:
+    description: Allows using the movement command.
+    default: op
+  movementui.closemenu:
+    default: op
+  movementui.startmenu:
+    default: op
+  movementui.reload:
+    description: Allows reloading the plugin's configuration.
+    default: op

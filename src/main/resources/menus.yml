@@ -1,0 +1,61 @@
+default:
+  origin: 0 0 0
+  enabledCoordinates:
+    1:
+      from:
+        x: 0
+        y: 1
+        z: 0
+      to:
+        x: 8
+        y: 1
+        z: 0
+    2:
+      from:
+        x: 1
+        y: -1
+        z: 0
+      to:
+        x: 8
+        y: -1
+        z: 0
+  '1':
+    targetX: 5
+    targetY: 1
+    targetZ: 1
+    commands:
+      1:
+        command: say hello
+        executionType: op
+      2:
+        command: give %player% diamond 1
+        executionType: console
+  '2':
+    targetX: 5
+    targetY: 1
+    targetZ: 0
+    nextMenu: menuthree
+  '3':
+    targetX: 1
+    targetY: 1
+    targetZ: 0
+    nextMenu: menuthree
+    commands:
+      1:
+        command: say hello
+        executionType: console
+menuthree:
+  blockedCoordinates:
+    from:
+      x: -10
+      y: 1
+      z: 0
+    to:
+      x: 8
+      y: 1
+      z: 0
+  '1':
+    targetX: 7
+    targetY: 5
+    targetZ: 1
+    nextMenu: default
