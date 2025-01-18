@@ -21,10 +21,6 @@ import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    companion object {
-        lateinit var instance: MovementsMain
-            private set
-    }
     var vers = "1.0.7"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
@@ -39,25 +35,46 @@ class MovementsMain : JavaPlugin() {
     fun String.toMiniMessageComponent(): Component {
         val legacyHexPattern = Pattern.compile("&x((&[A-Fa-f0-9]){6})")
         var result = this
-
         val matcher = legacyHexPattern.matcher(result)
         while (matcher.find()) {
             val fullMatch = matcher.group()
             val hexSequence = fullMatch.replace("&x", "").replace("&", "")
-            val formattedCode = hexSequence.chunked(2).joinToString("") { it }
-            result = result.replace(fullMatch, "<#${formattedCode}>")
+            result = result.replace(fullMatch, "<#${hexSequence}>")
         }
-        result = result.replace("&([0-9a-fA-Fk-oK-OrR])".toRegex(), "<$1>")
-
+        result = result.replace("&([0-9a-fA-Fk-oK-OrR])".toRegex()) { matchResult ->
+            val colorCode = matchResult.groupValues[1]
+            when (colorCode.lowercase()) {
+                "k" -> "<obfuscate>"
+                "l" -> "<bold>"
+                "m" -> "<strikethrough>"
+                "n" -> "<underline>"
+                "o" -> "<italic>"
+                "r" -> "<reset>"
+                "0" -> "<black>"
+                "1" -> "<dark_blue>"
+                "2" -> "<dark_green>"
+                "3" -> "<dark_aqua>"
+                "4" -> "<dark_red>"
+                "5" -> "<dark_purple>"
+                "6" -> "<gold>"
+                "7" -> "<gray>"
+                "8" -> "<dark_gray>"
+                "9" -> "<blue>"
+                "a" -> "<green>"
+                "b" -> "<aqua>"
+                "c" -> "<red>"
+                "d" -> "<light_purple>"
+                "e" -> "<yellow>"
+                "f" -> "<white>"
+                else -> "<reset>"
+            }
+        }
         return MiniMessage.miniMessage().deserialize(result)
     }
+
     lateinit var api: MovementUI_API
     override fun onEnable() {
         saveDefaultConfig()
-        api = MovementUI_API(this)
-
-        Bukkit.getServicesManager().register(MovementUI_API::class.java, api, this, ServicePriority.Normal)
-
         settingsFile = File(dataFolder, "config.yml")
         bindFile = File(dataFolder, "bind.yml")
         configFile = File(dataFolder, "menus.yml")
@@ -87,14 +104,17 @@ class MovementsMain : JavaPlugin() {
         this.getCommand("movementui")?.setTabCompleter(MovementTabCompleter(configFile))
         validateConfig("config.yml", settingsConfig)
         validateConfig("lang.yml", langConfig)
-        logger.info(" " +
-                "\n" +
+        api = MovementUI_API(this)
+
+        Bukkit.getServicesManager().register(MovementUI_API::class.java, api, this, ServicePriority.Normal)
+        logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
-                " |  \\/  |                                   | | | |  | |_   _|    MovementUI: $vers\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |      Build Data: 2025/1/17-23:10\n" +
-                " | |\\/| |/ _ \\ \\ / / _ \\ '_  _ \\ / _ \\ '_ \\| __| |  | | | |      Author: Neyran\n" +
+                " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/18-18:50\n" +
+                " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
+                "                                                              \n" +
                 "                                                              ")
     }
     override fun onDisable() {
@@ -207,8 +227,11 @@ class MovementsMain : JavaPlugin() {
                 .build())
             player.sendMessage(message)
         } else {
+            val bindCommandEnabled = settingsConfig.getBoolean("bind-command", false)
             state.navigationMode = true
-
+            if (bindCommandEnabled) {
+                processBindCommands(player, "bind_enter")
+            }
             val origin = customConfig.getConfigurationSection(menuName)?.getString("origin", "0 0 0")?.split(" ")?.map { it.toInt() } ?: listOf(0, 0, 0)
             state.x = origin[0]
             state.y = origin[1]
@@ -233,6 +256,10 @@ class MovementsMain : JavaPlugin() {
             player.sendMessage(message)
         } else {
             state.navigationMode = false
+            val bindCommandEnabled = settingsConfig.getBoolean("bind-command", false)
+            if (bindCommandEnabled) {
+                processBindCommands(player, "bind_exit")
+            }
         }
     }
     private fun reloadConfigs() {
@@ -310,6 +337,7 @@ class MovementsMain : JavaPlugin() {
             state.z = prevZ
         }
     }
+
     private fun formatMessage(message: String, state: PlayerState): String {
         return message.replace("{x}", "${state.x}")
             .replace("{y}", "${state.y}")
@@ -382,9 +410,16 @@ class MovementsMain : JavaPlugin() {
         state.savedZ = z
         state.savedMenu = menu
     }
+
     private fun executeCommandForCoordinates(player: Player, state: PlayerState) {
         val menuName = state.currentMenu
         val menuSection = customConfig.getConfigurationSection(menuName) ?: return
+
+        val permission = menuSection.getString("permission")
+        if (permission != null && !player.hasPermission(permission)) {
+            sendDebugMessage(player, "You do not have permission to access this menu.")
+            return
+        }
 
         for (key in menuSection.getKeys(false)) {
             if (key == "enabledCoordinates" || key == "blockedCoordinates") continue
@@ -395,58 +430,139 @@ class MovementsMain : JavaPlugin() {
             val targetZ = commandSection.getInt("targetZ")
 
             if (state.x == targetX && state.y == targetY && state.z == targetZ) {
-                val command = commandSection.getString("command")
-                val nextMenu = commandSection.getString("nextMenu")
-                val executionType = commandSection.getString("executionType") ?: "player"
+                findAndExecuteCommands(commandSection, player, state)
+                return
+            }
+        }
+    }
 
-                if (command != null) {
-                    object : BukkitRunnable() {
-                        override fun run() {
-                            when (executionType) {
-                                "console" -> server.dispatchCommand(
-                                    server.consoleSender,
-                                    command.replace("%player%", player.name)
-                                )
+    private fun findAndExecuteCommands(section: ConfigurationSection, player: Player, state: PlayerState) {
+        val commands = section.getConfigurationSection("commands")
+        val nextMenu = section.getString("nextMenu")
+        val swap = section.getString("swap")
 
-                                "player" -> player.performCommand(command.replace("%player%", player.name))
-                                "op" -> {
-                                    val wasOp = player.isOp
-                                    player.isOp = true
-                                    player.performCommand(command.replace("%player%", player.name))
-                                    player.isOp = wasOp
-                                }
+        commands?.let {
+            it.getKeys(false).forEach { key ->
+                val command = it.getString("$key.command")
+                val executionType = it.getString("$key.executionType") ?: "player"
+                if (command != null && isCommandConditionMet(it.getConfigurationSection(key)!!, player)) {
+                    executeCommand(command, player, executionType)
+                }
+            }
+        }
 
-                                else -> Bukkit.getLogger().warning("Unknown execution type: $executionType")
-                            }
-                        }
-                    }.runTask(MovementsMain.instance)
+        swap?.let {
+            val swapCoordinates = it.split(" ").mapNotNull { it.toIntOrNull() }
+            if (swapCoordinates.size == 3) {
+                state.x = swapCoordinates[0]
+                state.y = swapCoordinates[1]
+                state.z = swapCoordinates[2]
+            }
+        }
 
+        nextMenu?.let { nextMenuValue ->
+            val parts = nextMenuValue.split(" ")
+            val menuName = parts[0]
+            val newCoordinates = if (parts.size == 4) {
+                parts.subList(1, 4).mapNotNull { it.toIntOrNull() }
+            } else {
+                null
+            }
 
-                    if (nextMenu != null) {
-                        state.currentMenu = nextMenu
-                        val origin =
-                            customConfig.getConfigurationSection(nextMenu)?.getString("origin", "0 0 0")?.split(" ")
-                                ?.map { it.toInt() } ?: listOf(0, 0, 0)
-                        state.x = origin[0]
-                        state.y = origin[1]
-                        state.z = origin[2]
+            state.currentMenu = menuName
 
-                        sendDebugMessage(player, "You have switched to menu: $nextMenu")
-                    }
-                    return
+            if (newCoordinates != null && newCoordinates.size == 3) {
+                state.x = newCoordinates[0]
+                state.y = newCoordinates[1]
+                state.z = newCoordinates[2]
+            } else {
+                val origin = customConfig.getConfigurationSection(menuName)
+                    ?.getString("origin", "0 0 0")
+                    ?.split(" ")
+                    ?.mapNotNull { it.toIntOrNull() }
+                    ?: listOf(0, 0, 0)
+
+                if (origin.size == 3) {
+                    state.x = origin[0]
+                    state.y = origin[1]
+                    state.z = origin[2]
+                } else {
+                    state.x = 0
+                    state.y = 0
+                    state.z = 0
                 }
             }
         }
     }
+
+
+    private fun executeCommand(command: String, player: Player, executionType: String) {
+        Bukkit.getScheduler().runTask(this, Runnable {
+            when (executionType) {
+                "console" -> this.server.dispatchCommand(
+                    this.server.consoleSender,
+                    command.replace("%player%", player.name)
+                )
+                "player" -> player.performCommand(command.replace("%player%", player.name))
+                "op" -> {
+                    val wasOp = player.isOp
+                    player.isOp = true
+                    try {
+                        player.performCommand(command.replace("%player%", player.name))
+                    } finally {
+                        player.isOp = wasOp
+                    }
+                }
+                else -> this.logger.warning("Unknown execution type: $executionType")
+            }
+        })
+    }
+
+
+    private fun isCommandConditionMet(commandSection: ConfigurationSection, player: Player): Boolean {
+        val conditionsSection = commandSection.getConfigurationSection("conditions")
+        if (conditionsSection != null) {
+            var finalResult = true
+
+            for (conditionKey in conditionsSection.getKeys(false)) {
+                val condition = conditionsSection.getConfigurationSection(conditionKey) ?: continue
+                val first = condition.getString("first") ?: continue
+                val second = condition.getString("second") ?: continue
+                val operation = condition.getString("operation") ?: continue
+                val gate = condition.getString("gate") ?: "and"
+
+                val firstValue = PlaceholderAPI.setPlaceholders(player, first)
+                val secondValue = PlaceholderAPI.setPlaceholders(player, second)
+
+                val result = compareValues(firstValue, secondValue, operation)
+                finalResult = if (finalResult) {
+                    when (gate.lowercase()) {
+                        "and" -> finalResult && result
+                        "or" -> finalResult || result
+                        else -> finalResult
+                    }
+                } else {
+                    when (gate.lowercase()) {
+                        "and" -> false
+                        "or" -> finalResult || result
+                        else -> finalResult
+                    }
+                }
+            }
+            if (!finalResult) {
+                return false
+            }
+        }
+        return true
+    }
+
     private fun isCoordConditionMet(state: PlayerState, player: Player): Boolean {
         val menuName = state.currentMenu
         val menuSection = customConfig.getConfigurationSection(menuName) ?: return false
-
         for (key in menuSection.getKeys(false)) {
-            if (key == "enabledCoordinates" || key == "blockedCoordinates") {
+            if (key == "enabledCoordinates" || key == "blockedCoordinates" || key == "permission") {
                 continue
             }
-
             val commandSection = menuSection.getConfigurationSection(key) ?: continue
 
             val targetX = commandSection.getInt("targetX", -999)
@@ -454,22 +570,17 @@ class MovementsMain : JavaPlugin() {
             val targetZ = commandSection.getInt("targetZ", -999)
 
             if (state.x == targetX && state.y == targetY && state.z == targetZ) {
-
                 val conditionsSection = commandSection.getConfigurationSection("panel_conditions")
                 if (conditionsSection != null) {
-
                     var finalResult = true
                     for (conditionKey in conditionsSection.getKeys(false)) {
                         val condition = conditionsSection.getConfigurationSection(conditionKey) ?: continue
-
                         val first = condition.getString("first") ?: continue
                         val second = condition.getString("second") ?: continue
                         val operation = condition.getString("operation") ?: continue
                         val gate = condition.getString("gate") ?: "and"
-
                         val firstValue = PlaceholderAPI.setPlaceholders(player, first)
                         val secondValue = PlaceholderAPI.setPlaceholders(player, second)
-
                         val result = compareValues(firstValue, secondValue, operation)
 
                         finalResult = if (finalResult) {
@@ -485,20 +596,15 @@ class MovementsMain : JavaPlugin() {
                                 else -> finalResult
                             }
                         }
-
                     }
-
                     if (!finalResult) {
                         return false
                     }
-
                     return true
                 }
-
                 return true
             }
         }
-
         return true
     }
     fun compareValues(firstValue: String, secondValue: String, operation: String): Boolean {

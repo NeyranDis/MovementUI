@@ -32,7 +32,7 @@ class ProtocolListener(private val plugin: MovementsMain) {
         val state = plugin.playerStates[player.name] ?: return
 
         if (state.navigationMode) {
-            player.walkSpeed = 0.01f
+            player.walkSpeed = 0.005f
             val currentTime = System.currentTimeMillis()
 
             if (state.lastMoveTime != null && currentTime - state.lastMoveTime!! < 100) {
