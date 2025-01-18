@@ -26,7 +26,6 @@ class ProtocolListener(private val plugin: MovementsMain) {
             }
         })
     }
-
     private fun handlePacket(event: PacketEvent) {
         val player: Player = event.player
         val state = plugin.playerStates[player.name] ?: return
@@ -67,7 +66,6 @@ class ProtocolListener(private val plugin: MovementsMain) {
                 angleDiff in 225.0..315.0 -> "A"
                 else -> null
             }
-
             direction?.let {
                 state.lastKeyPressed = it
                 plugin.updatePlayerCoordinates(player, it)

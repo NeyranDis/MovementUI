@@ -17,7 +17,6 @@ class MovementTabCompleter(private val configFile: File) : TabCompleter {
         if (command.name.equals("movementui", ignoreCase = true) || command.name.equals("mui", ignoreCase = true)) {
             return when (args.size) {
                 1 -> {
-                    // Предлагаем основные команды
                     listOf("startmenu", "closemenu", "reload").filter { it.startsWith(args[0], ignoreCase = true) }
                 }
                 2 -> {

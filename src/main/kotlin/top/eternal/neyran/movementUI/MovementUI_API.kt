@@ -7,8 +7,6 @@ import org.bukkit.event.HandlerList
 import org.bukkit.configuration.file.YamlConfiguration
 
 class MovementUI_API(private val plugin: MovementsMain) {
-
-
     /**
      * Активирует или деактивирует режим навигации для игрока и вызывает событие BindActivatorEvent.
      *
@@ -28,17 +26,14 @@ class MovementUI_API(private val plugin: MovementsMain) {
                 mapOf("menu" to state.currentMenu)
             )
         }
-
         val event = BindActivatorEvent(player)
         Bukkit.getServer().pluginManager.callEvent(event)
     }
-
 
     class BindActivatorEvent(val player: Player) : Event() {
         companion object {
             val HANDLER_LIST = HandlerList()
         }
-
         override fun getHandlers(): HandlerList {
             return HANDLER_LIST
         }

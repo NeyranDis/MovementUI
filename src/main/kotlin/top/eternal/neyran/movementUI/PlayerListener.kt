@@ -18,7 +18,6 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         plugin.playerStates.remove(event.player.name)
-
     }
     @EventHandler
     fun onPlayerInteractWithVehicle(event: PlayerInteractEntityEvent) {

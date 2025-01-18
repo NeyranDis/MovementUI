@@ -303,6 +303,10 @@ class MovementsMain : JavaPlugin() {
         val prevY = state.y
         val prevZ = state.z
 
+        // Сохраняем предыдущие координаты
+        savePlayerState(state, prevX, prevY, prevZ, state.currentMenu)
+
+        // Изменяем координаты в зависимости от направления
         when (direction) {
             "W" -> state.y += 1
             "S" -> state.y -= 1
@@ -320,23 +324,42 @@ class MovementsMain : JavaPlugin() {
             return
         }
 
-        savePlayerState(state, prevX, prevY, prevZ, state.currentMenu)
+        val menuSection = customConfig.getConfigurationSection(state.currentMenu) ?: return
+
+        val nextMenu = menuSection.getKeys(false)
+            .mapNotNull { key ->
+                if (key == "enabledCoordinates" || key == "blockedCoordinates") return@mapNotNull null
+
+                val section = menuSection.getConfigurationSection(key) ?: return@mapNotNull null
+                val targetX = section.getInt("targetX")
+                val targetY = section.getInt("targetY")
+                val targetZ = section.getInt("targetZ")
+
+                if (state.x == targetX && state.y == targetY && state.z == targetZ) {
+                    section.getString("nextMenu")
+                } else {
+                    null
+                }
+            }.firstOrNull()
+
+        if (nextMenu != null) {
+            val nextMenuSection = customConfig.getConfigurationSection(nextMenu)
+            val permission = nextMenuSection?.getString("permission")
+
+            if (permission != null && !player.hasPermission(permission)) {
+                state.x = prevX
+                state.y = prevY
+                state.z = prevZ
+                sendDebugMessage(player, "${langConfig.get("debug.navigation.permission_denied")}")
+                return
+            }
+        }
+
         executeCommandForCoordinates(player, state)
 
         sendDebugMessage(player, formatMessage(langConfig.getString("debug.navigation.coordinates") ?: "", state))
-        val savedX = state.savedX
-        val savedY = state.savedY
-        val savedZ = state.savedZ
-
-        state.savedX = prevX
-        state.savedY = prevY
-        state.savedZ = prevZ
-        if (state.x == savedX && state.y == savedY && state.z == savedZ) {
-            state.x = prevX
-            state.y = prevY
-            state.z = prevZ
-        }
     }
+
 
     private fun formatMessage(message: String, state: PlayerState): String {
         return message.replace("{x}", "${state.x}")
@@ -495,7 +518,6 @@ class MovementsMain : JavaPlugin() {
         }
     }
 
-
     private fun executeCommand(command: String, player: Player, executionType: String) {
         Bukkit.getScheduler().runTask(this, Runnable {
             when (executionType) {
@@ -517,7 +539,6 @@ class MovementsMain : JavaPlugin() {
             }
         })
     }
-
 
     private fun isCommandConditionMet(commandSection: ConfigurationSection, player: Player): Boolean {
         val conditionsSection = commandSection.getConfigurationSection("conditions")
