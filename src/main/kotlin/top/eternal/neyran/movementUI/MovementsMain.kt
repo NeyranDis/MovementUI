@@ -303,10 +303,6 @@ class MovementsMain : JavaPlugin() {
         val prevY = state.y
         val prevZ = state.z
 
-        // Сохраняем предыдущие координаты
-        savePlayerState(state, prevX, prevY, prevZ, state.currentMenu)
-
-        // Изменяем координаты в зависимости от направления
         when (direction) {
             "W" -> state.y += 1
             "S" -> state.y -= 1
@@ -358,9 +354,7 @@ class MovementsMain : JavaPlugin() {
                 return
             }
         }
-
         executeCommandForCoordinates(player, state)
-
         sendDebugMessage(player, formatMessage(langConfig.getString("debug.navigation.coordinates") ?: "", state))
     }
 
@@ -430,12 +424,6 @@ class MovementsMain : JavaPlugin() {
             }
         }
         return false
-    }
-    private fun savePlayerState(state: PlayerState, x: Int, y: Int, z: Int, menu: String) {
-        state.savedX = x
-        state.savedY = y
-        state.savedZ = z
-        state.savedMenu = menu
     }
 
     private fun executeCommandForCoordinates(player: Player, state: PlayerState) {

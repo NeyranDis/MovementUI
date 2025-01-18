@@ -8,8 +8,4 @@ data class PlayerState(
     var z: Int = 0,
     var currentMenu: String = "default",
     var lastMoveTime: Long? = null,
-    var savedMenu: String = "",
-    var savedX: Int = 0,
-    var savedY: Int = 0,
-    var savedZ: Int = 0
 )
