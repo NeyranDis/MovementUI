@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 
 class PlaceholderHook(private val plugin: MovementsMain) : PlaceholderExpansion() {
 
-    override fun getIdentifier(): String = "movements"
+    override fun getIdentifier(): String = "movementui"
 
     override fun getAuthor(): String = plugin.description.authors.joinToString()
 
@@ -15,14 +15,20 @@ class PlaceholderHook(private val plugin: MovementsMain) : PlaceholderExpansion(
         if (player == null) return null
         val state = plugin.playerStates[player.name] ?: return "None"
 
-        if (!state.navigationMode) return "None"
+        if (!state.navigationMode) {
+            return if (params.lowercase() == "navigation") {
+                "false"
+            } else {
+                "None"
+            }
+        }
 
         return when (params.lowercase()) {
-            "last" -> state.lastKeyPressed ?: "None"
-            "coordinates" -> "${state.x}, ${state.y}, ${state.z}"
-            "full_coordinates" -> "${state.x}, ${state.y}, ${state.z}, ${state.currentMenu}"
-            "menu" -> "${state.currentMenu}"
-            "enable" -> "${state.navigationMode}"
+            "last_key" -> state.lastKeyPressed ?: "None"
+            "current_coordinates" -> "${state.x}, ${state.y}, ${state.z}"
+            "current_coordinates_full" -> "${state.x}, ${state.y}, ${state.z}, ${state.currentMenu}"
+            "currentmenu" -> state.currentMenu
+            "navigation" -> if (state.navigationMode) "true" else "false"
             else -> null
         }
     }
