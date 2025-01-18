@@ -29,7 +29,8 @@ class ProtocolListener(private val plugin: MovementsMain) {
     private fun handlePacket(event: PacketEvent) {
         val player: Player = event.player
         val state = plugin.playerStates[player.name] ?: return
-
+        val locationBelow = player.location.add(0.0, -1.0, 0.0)
+        val blockBelow = locationBelow.block
         if (state.navigationMode) {
             player.walkSpeed = 0.005f
             val currentTime = System.currentTimeMillis()
@@ -39,7 +40,14 @@ class ProtocolListener(private val plugin: MovementsMain) {
             }
 
             state.lastMoveTime = currentTime
-
+            if (plugin.settingsConfig.getBoolean("air_fix", true)) {
+                if (!player.isFlying) {
+                    if (blockBelow.type == Material.AIR || blockBelow.type == Material.CAVE_AIR || blockBelow.type == Material.VOID_AIR) {
+                        state.navigationMode = false
+                        return
+                    }
+                }
+            }
             val currentLocation = player.location
             val packet = event.packet
 
