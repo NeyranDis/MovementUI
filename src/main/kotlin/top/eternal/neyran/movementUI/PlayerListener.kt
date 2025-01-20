@@ -1,11 +1,17 @@
 package top.eternal.neyran.movementUI
 
+import com.comphenix.protocol.events.ListenerPriority
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
+import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.EntityDismountEvent
 import org.bukkit.event.player.*
 
 class PlayerListener(private val plugin: MovementsMain) : Listener {
@@ -17,8 +23,19 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
     }
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        plugin.playerStates.remove(event.player.name)
+        val player = event.player
+        val state = plugin.playerStates[player.name] ?: return
+
+        if (state.navigationMode) {
+            val armorStand = state.armorStand?.let { uuid ->
+                Bukkit.getEntity(uuid) as? ArmorStand
+            }
+            armorStand?.remove()
+            state.armorStand = null
+            state.navigationMode = false
+        }
     }
+
     @EventHandler
     fun onPlayerInteractWithVehicle(event: PlayerInteractEntityEvent) {
         val player = event.player
@@ -54,6 +71,18 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             }
         }
     }
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun onDismount(event: EntityDismountEvent) {
+        val entity = event.entity
+        if (entity is Player) {
+            val player = entity
+
+            val state = plugin.playerStates[player.name] ?: return
+            if (state.navigationMode) {
+                event.isCancelled = true
+            }
+        }
+    }
     @EventHandler
     fun onPlayerBreakBlock(event: BlockBreakEvent) {
         val player = event.player
@@ -61,35 +90,6 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
         val state = plugin.playerStates[player.name] ?: return
         if (state.navigationMode) {
             state.navigationMode = false
-        }
-    }
-    @EventHandler(priority = EventPriority.HIGH)
-    fun onPlayerMove(event: PlayerMoveEvent) {
-        val player = event.player
-        val state = plugin.playerStates[player.name] ?: return
-        if (state.navigationMode) {
-            event.isCancelled = true
-        }
-    }
-    @EventHandler(priority = EventPriority.HIGHEST)
-    fun onPlayerToggleSneak(event: PlayerToggleSneakEvent) {
-        val player = event.player
-        val state = plugin.playerStates[player.name] ?: return
-
-        if (state.navigationMode && event.isSneaking) {
-            plugin.updatePlayerCoordinates(player, "Shift")
-            state.lastKeyPressed = "Shift"
-        }
-    }
-    @EventHandler(priority = EventPriority.HIGHEST)
-    fun onPlayerJumpEvent(event: PlayerJumpEvent) {
-        val player = event.player
-        val state = plugin.playerStates[player.name] ?: return
-
-        if (state.navigationMode) {
-            plugin.updatePlayerCoordinates(player, "Space")
-            state.lastKeyPressed = "Space"
-            event.isCancelled = true
         }
     }
     @EventHandler

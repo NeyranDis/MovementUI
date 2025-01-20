@@ -6,8 +6,10 @@ import com.comphenix.protocol.ProtocolLibrary
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.Location
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
@@ -16,13 +18,15 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
+import org.bukkit.entity.ArmorStand
+import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.0.7.1"
+    var vers = "1.0.8"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
     lateinit var customConfig: FileConfiguration
@@ -32,6 +36,9 @@ class MovementsMain : JavaPlugin() {
     lateinit var langConfig: FileConfiguration
     lateinit var bindFile: File
     lateinit var bindConfig: FileConfiguration
+    fun key(name: String): NamespacedKey {
+        return NamespacedKey(this, name)
+    }
 
     fun String.toMiniMessageComponent(): Component {
         val legacyHexPattern = Pattern.compile("&x((&[A-Fa-f0-9]){6})")
@@ -111,7 +118,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/18-20:43\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/20-18:31\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -250,61 +257,94 @@ class MovementsMain : JavaPlugin() {
 
         fileConfig.save(File(dataFolder, resourceName))
     }
+
     fun startNavigation(player: Player, menuName: String) {
-
-        val state = playerStates[player.name] ?: PlayerState().also { playerStates[player.name] = it }
-        if (!player.isOnGround) {
-            if (player.isFlying) {
-                state.navigationMode = true
-                return
-            } else {
-                state.navigationMode = false
-                return
-            }
-        }
-
-        if (state.navigationMode) {
-            val message = (Component.text()
-                .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
-                .append(langConfig.getString("navigation.enabled")?.toMiniMessageComponent() ?: Component.text(""))
-                .build())
-            player.sendMessage(message)
-        } else {
-            val bindCommandEnabled = settingsConfig.getBoolean("bind-command", false)
-            state.navigationMode = true
-            if (bindCommandEnabled) {
-                processBindCommands(player, "bind_enter")
-            }
-            val origin = customConfig.getConfigurationSection(menuName)?.getString("origin", "0 0 0")?.split(" ")?.map { it.toInt() } ?: listOf(0, 0, 0)
-            state.x = origin[0]
-            state.y = origin[1]
-            state.z = origin[2]
-
-            state.currentMenu = menuName
-            val placeholders = mapOf(
-                "menu" to state.currentMenu,
-            )
-
-            sendDebugMessage(player, langConfig.getString("debug.navigation.enter") ?: "", placeholders)
-        }
-    }
-    fun closeNavigation(player: Player) {
         val state = playerStates[player.name] ?: PlayerState().also { playerStates[player.name] = it }
 
         if (!state.navigationMode) {
-            val message = (Component.text()
-                .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
-                .append(langConfig.getString("navigation.disabled")?.toMiniMessageComponent() ?: Component.text(""))
-                .build())
-            player.sendMessage(message)
-        } else {
-            state.navigationMode = false
-            val bindCommandEnabled = settingsConfig.getBoolean("bind-command", false)
-            if (bindCommandEnabled) {
-                processBindCommands(player, "bind_exit")
+            state.navigationMode = true
+            val world = player.world
+            val location = player.location.clone().apply {
+                y = player.location.y + 1
             }
+
+            val armorStand = world.spawn(location, ArmorStand::class.java)
+            armorStand.apply {
+                isVisible = false
+                isSmall = true
+                isMarker = true
+                isInvulnerable = true
+                isCustomNameVisible = false
+                setGravity(false)
+                customName = "navigation_stand_${player.uniqueId}"
+                persistentDataContainer.set(key("navigationOwner"), PersistentDataType.STRING, player.uniqueId.toString())
+            }
+
+            armorStand.addPassenger(player)
+
+            object : BukkitRunnable() {
+                override fun run() {
+                    state.armorStand = armorStand.uniqueId
+
+                    if (settingsConfig.getBoolean("bind-command", false)) {
+                        processBindCommands(player, "bind_enter")
+                    }
+
+                    val origin = customConfig.getConfigurationSection(menuName)
+                        ?.getString("origin", "0 0 0")
+                        ?.split(" ")
+                        ?.mapNotNull { it.toIntOrNull() }
+                        ?: listOf(0, 0, 0)
+
+                    state.x = origin.getOrElse(0) { 0 }
+                    state.y = origin.getOrElse(1) { 0 }
+                    state.z = origin.getOrElse(2) { 0 }
+                    state.currentMenu = menuName
+
+                    val placeholders = mapOf("menu" to state.currentMenu)
+                    sendDebugMessage(player, langConfig.getString("debug.navigation.enter") ?: "", placeholders)
+
+                    val message = Component.text()
+                        .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
+                        .append(langConfig.getString("navigation.enabled")?.toMiniMessageComponent() ?: Component.text(""))
+                        .build()
+
+                    player.sendMessage(message)
+                }
+            }.runTaskLater(this, 5L)
         }
     }
+
+
+    fun closeNavigation(player: Player) {
+        val state = playerStates[player.name] ?: PlayerState().also { playerStates[player.name] = it }
+
+        if (state.navigationMode) {
+            state.navigationMode = false
+
+            val armorStand = state.armorStand?.let { uuid ->
+                Bukkit.getEntity(uuid) as? ArmorStand
+            }
+
+            armorStand?.remove()
+
+            state.armorStand = null
+
+            if (settingsConfig.getBoolean("bind-command", false)) {
+                processBindCommands(player, "bind_exit")
+            }
+
+            val message = Component.text()
+                .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
+                .append(langConfig.getString("navigation.disabled")?.toMiniMessageComponent() ?: Component.text(""))
+                .build()
+
+            player.sendMessage(message)
+        }
+    }
+
+
+
     private fun reloadConfigs() {
         customConfig = YamlConfiguration.loadConfiguration(configFile)
         bindConfig = YamlConfiguration.loadConfiguration(bindFile)
