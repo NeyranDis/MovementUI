@@ -24,6 +24,7 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val player = event.player
+        plugin.playerStates.remove(event.player.name)
         val state = plugin.playerStates[player.name] ?: return
 
         if (state.navigationMode) {

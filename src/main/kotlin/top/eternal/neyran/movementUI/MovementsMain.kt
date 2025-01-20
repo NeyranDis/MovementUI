@@ -1,12 +1,8 @@
 package top.eternal.neyran.movementUI
 
 import ProtocolListener
-import com.comphenix.protocol.ProtocolManager
-import com.comphenix.protocol.ProtocolLibrary
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Location
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -26,7 +22,7 @@ import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.0.8"
+    var vers = "1.0.8.1"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
     lateinit var customConfig: FileConfiguration
@@ -118,7 +114,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/20-18:31\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/20-20:33\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -159,17 +155,6 @@ class MovementsMain : JavaPlugin() {
                         }
 
                         if (sender is Player && !sender.hasPermission("movementui.startmenu")) {
-                            val message = Component.text()
-                                .append(
-                                    langConfig.getString("plugin.tag")?.toMiniMessageComponent()
-                                        ?: Component.text("")
-                                )
-                                .append(
-                                    langConfig.getString("no.permissions")?.toMiniMessageComponent()
-                                        ?: Component.text("")
-                                )
-                                .build()
-                            sender.sendMessage(message)
                             return true
                         }
 
@@ -198,17 +183,6 @@ class MovementsMain : JavaPlugin() {
                     }
 
                     if (sender is Player && !sender.hasPermission("movementui.closemenu")) {
-                        val message = Component.text()
-                            .append(
-                                langConfig.getString("plugin.tag")?.toMiniMessageComponent()
-                                    ?: Component.text("")
-                            )
-                            .append(
-                                langConfig.getString("no.permissions")?.toMiniMessageComponent()
-                                    ?: Component.text("")
-                            )
-                            .build()
-                        sender.sendMessage(message)
                         return true
                     }
 
@@ -259,17 +233,16 @@ class MovementsMain : JavaPlugin() {
     }
 
     fun startNavigation(player: Player, menuName: String) {
-        val state = playerStates[player.name] ?: PlayerState().also { playerStates[player.name] = it }
+        val state = playerStates.getOrPut(player.name) { PlayerState() }
 
         if (!state.navigationMode) {
             state.navigationMode = true
             val world = player.world
             val location = player.location.clone().apply {
-                y = player.location.y + 1
+                y += 1
             }
 
-            val armorStand = world.spawn(location, ArmorStand::class.java)
-            armorStand.apply {
+            val armorStand = world.spawn(location, ArmorStand::class.java).apply {
                 isVisible = false
                 isSmall = true
                 isMarker = true
@@ -301,48 +274,35 @@ class MovementsMain : JavaPlugin() {
                     state.z = origin.getOrElse(2) { 0 }
                     state.currentMenu = menuName
 
-                    val placeholders = mapOf("menu" to state.currentMenu)
-                    sendDebugMessage(player, langConfig.getString("debug.navigation.enter") ?: "", placeholders)
-
-                    val message = Component.text()
-                        .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
-                        .append(langConfig.getString("navigation.enabled")?.toMiniMessageComponent() ?: Component.text(""))
-                        .build()
-
-                    player.sendMessage(message)
+                    sendDebugMessage(player, langConfig.getString("debug.navigation.enter") ?: "", mapOf("menu" to state.currentMenu))
                 }
             }.runTaskLater(this, 5L)
         }
     }
 
-
     fun closeNavigation(player: Player) {
-        val state = playerStates[player.name] ?: PlayerState().also { playerStates[player.name] = it }
+        val state = playerStates.getOrPut(player.name) { PlayerState() }
 
         if (state.navigationMode) {
-            state.navigationMode = false
-
-            val armorStand = state.armorStand?.let { uuid ->
-                Bukkit.getEntity(uuid) as? ArmorStand
+            state.apply {
+                navigationMode = false
+                x = 0
+                y = 0
+                z = 0
+                currentMenu = "default"
+                lastKeyPressed = null
+                lastMoveTime = null
             }
 
-            armorStand?.remove()
+            (Bukkit.getEntity(state.armorStand ?: return) as? ArmorStand)?.remove()
 
             state.armorStand = null
 
             if (settingsConfig.getBoolean("bind-command", false)) {
                 processBindCommands(player, "bind_exit")
             }
-
-            val message = Component.text()
-                .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
-                .append(langConfig.getString("navigation.disabled")?.toMiniMessageComponent() ?: Component.text(""))
-                .build()
-
-            player.sendMessage(message)
         }
     }
-
 
 
     private fun reloadConfigs() {
