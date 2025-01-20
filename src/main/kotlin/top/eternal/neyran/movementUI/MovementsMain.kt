@@ -22,7 +22,7 @@ import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.0.8.1"
+    var vers = "1.0.8.2"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
     lateinit var customConfig: FileConfiguration
@@ -114,7 +114,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/20-20:33\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/20-21:39\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -577,48 +577,18 @@ class MovementsMain : JavaPlugin() {
 
     private fun isCommandConditionMet(commandSection: ConfigurationSection, player: Player): Boolean {
         val conditionsSection = commandSection.getConfigurationSection("conditions")
-        if (conditionsSection != null) {
-            var finalResult = true
-
-            for (conditionKey in conditionsSection.getKeys(false)) {
-                val condition = conditionsSection.getConfigurationSection(conditionKey) ?: continue
-                val first = condition.getString("first") ?: continue
-                val second = condition.getString("second") ?: continue
-                val operation = condition.getString("operation") ?: continue
-                val gate = condition.getString("gate") ?: "and"
-
-                val firstValue = PlaceholderAPI.setPlaceholders(player, first)
-                val secondValue = PlaceholderAPI.setPlaceholders(player, second)
-
-                val result = compareValues(firstValue, secondValue, operation)
-                finalResult = if (finalResult) {
-                    when (gate.lowercase()) {
-                        "and" -> finalResult && result
-                        "or" -> finalResult || result
-                        else -> finalResult
-                    }
-                } else {
-                    when (gate.lowercase()) {
-                        "and" -> false
-                        "or" -> finalResult || result
-                        else -> finalResult
-                    }
-                }
-            }
-            if (!finalResult) {
-                return false
-            }
-        }
-        return true
+        return conditionsSection?.let { evaluateConditions(it, player) } ?: true
     }
 
     private fun isCoordConditionMet(state: PlayerState, player: Player): Boolean {
         val menuName = state.currentMenu
         val menuSection = customConfig.getConfigurationSection(menuName) ?: return false
+
         for (key in menuSection.getKeys(false)) {
-            if (key == "enabledCoordinates" || key == "blockedCoordinates" || key == "permission") {
+            if (key in setOf("enabledCoordinates", "blockedCoordinates", "permission")) {
                 continue
             }
+
             val commandSection = menuSection.getConfigurationSection(key) ?: continue
 
             val targetX = commandSection.getInt("targetX", -999)
@@ -627,42 +597,43 @@ class MovementsMain : JavaPlugin() {
 
             if (state.x == targetX && state.y == targetY && state.z == targetZ) {
                 val conditionsSection = commandSection.getConfigurationSection("panel_conditions")
-                if (conditionsSection != null) {
-                    var finalResult = true
-                    for (conditionKey in conditionsSection.getKeys(false)) {
-                        val condition = conditionsSection.getConfigurationSection(conditionKey) ?: continue
-                        val first = condition.getString("first") ?: continue
-                        val second = condition.getString("second") ?: continue
-                        val operation = condition.getString("operation") ?: continue
-                        val gate = condition.getString("gate") ?: "and"
-                        val firstValue = PlaceholderAPI.setPlaceholders(player, first)
-                        val secondValue = PlaceholderAPI.setPlaceholders(player, second)
-                        val result = compareValues(firstValue, secondValue, operation)
-
-                        finalResult = if (finalResult) {
-                            when (gate.lowercase()) {
-                                "and" -> finalResult && result
-                                "or" -> finalResult || result
-                                else -> finalResult
-                            }
-                        } else {
-                            when (gate.lowercase()) {
-                                "and" -> false
-                                "or" -> finalResult || result
-                                else -> finalResult
-                            }
-                        }
-                    }
-                    if (!finalResult) {
-                        return false
-                    }
-                    return true
-                }
-                return true
+                return conditionsSection?.let { evaluateConditions(it, player) } ?: true
             }
         }
         return true
     }
+
+    private fun evaluateConditions(conditionsSection: ConfigurationSection, player: Player): Boolean {
+        var finalResult = true
+
+        for (conditionKey in conditionsSection.getKeys(false)) {
+            val condition = conditionsSection.getConfigurationSection(conditionKey) ?: continue
+
+            val first = condition.getString("first") ?: continue
+            val second = condition.getString("second") ?: continue
+            val operation = condition.getString("operation") ?: continue
+            val gate = condition.getString("gate")?.lowercase() ?: "and"
+
+            val firstValue = PlaceholderAPI.setPlaceholders(player, first)
+            val secondValue = PlaceholderAPI.setPlaceholders(player, second)
+
+            val result = compareValues(firstValue, secondValue, operation)
+
+            finalResult = applyGateLogic(finalResult, result, gate)
+            if (!finalResult && gate == "and") return false // Оптимизация: прерываем цикл для AND.
+        }
+
+        return finalResult
+    }
+
+    private fun applyGateLogic(currentResult: Boolean, newResult: Boolean, gate: String): Boolean {
+        return when (gate) {
+            "and" -> currentResult && newResult
+            "or" -> currentResult || newResult
+            else -> currentResult // Если gate не задано, логика не изменяется.
+        }
+    }
+
     fun compareValues(firstValue: String, secondValue: String, operation: String): Boolean {
         return try {
             when (operation.lowercase()) {

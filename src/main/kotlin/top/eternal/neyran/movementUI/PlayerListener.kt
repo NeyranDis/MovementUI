@@ -1,7 +1,5 @@
 package top.eternal.neyran.movementUI
 
-import com.comphenix.protocol.events.ListenerPriority
-import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
@@ -9,7 +7,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDismountEvent
 import org.bukkit.event.player.*
@@ -18,115 +15,73 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        val player = event.player
-        plugin.playerStates[player.name] = PlayerState()
+        plugin.playerStates[event.player.name] = PlayerState()
     }
+
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        val player = event.player
-        plugin.playerStates.remove(event.player.name)
-        val state = plugin.playerStates[player.name] ?: return
+        val playerName = event.player.name
+        val state = plugin.playerStates.remove(playerName) ?: return
 
         if (state.navigationMode) {
-            val armorStand = state.armorStand?.let { uuid ->
-                Bukkit.getEntity(uuid) as? ArmorStand
+            state.armorStand?.let { uuid ->
+                (Bukkit.getEntity(uuid) as? ArmorStand)?.remove()
             }
-            armorStand?.remove()
-            state.armorStand = null
-            state.navigationMode = false
         }
     }
 
     @EventHandler
-    fun onPlayerInteractWithVehicle(event: PlayerInteractEntityEvent) {
-        val player = event.player
-
-        val state = plugin.playerStates[player.name] ?: return
-        if (state.navigationMode) {
-            state.navigationMode = false
-        }
+    fun onPlayerInteractWithEntity(event: PlayerInteractEntityEvent) {
+        disableNavigationIfActive(event.player)
     }
+
     @EventHandler
-    fun onPlayerInteractWithShulkerBox(event: PlayerInteractEvent) {
-        val player = event.player
+    fun onPlayerInteract(event: PlayerInteractEvent) {
         val clickedBlock = event.clickedBlock ?: return
-
         if (clickedBlock.type.name.endsWith("SHULKER_BOX")) {
-            val state = plugin.playerStates[player.name] ?: return
-            if (state.navigationMode) {
-                state.navigationMode = false
-            }
+            disableNavigationIfActive(event.player)
         }
     }
+
     @EventHandler
-    fun onPlayerInWaterOrLava(event: PlayerMoveEvent) {
-        val player = event.player
-        val location = player.location
-
-        val blockType = location.block.type
-
+    fun onPlayerMove(event: PlayerMoveEvent) {
+        val blockType = event.player.location.block.type
         if (blockType == Material.WATER || blockType == Material.LAVA) {
-            val state = plugin.playerStates[player.name] ?: return
-            if (state.navigationMode) {
-                state.navigationMode = false
-            }
+            disableNavigationIfActive(event.player)
         }
     }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onDismount(event: EntityDismountEvent) {
-        val entity = event.entity
-        if (entity is Player) {
-            val player = entity
-
+        if (event.entity is Player) {
+            val player = event.entity as Player
             val state = plugin.playerStates[player.name] ?: return
             if (state.navigationMode) {
                 event.isCancelled = true
             }
         }
     }
-    @EventHandler
-    fun onPlayerBreakBlock(event: BlockBreakEvent) {
-        val player = event.player
 
-        val state = plugin.playerStates[player.name] ?: return
-        if (state.navigationMode) {
-            state.navigationMode = false
-        }
-    }
     @EventHandler
-    fun onPlayerToggleSprint(event: PlayerToggleSprintEvent) {
-        val player = event.player
-        val state = plugin.playerStates[player.name] ?: return
-
-        if (state.navigationMode && event.isSprinting) {
-            state.navigationMode = false
-            plugin.sendDebugMessage(player,"${plugin.langConfig.get("navigation.toggle_disable")}")
-            state.lastKeyPressed = "Ctrl"
-        }
+    fun onBlockBreak(event: BlockBreakEvent) {
+        disableNavigationIfActive(event.player)
     }
-    @EventHandler
-    fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
-        val player = event.player
-        val state = plugin.playerStates[player.name] ?: return
 
-        if (state.navigationMode && event.isFlying) {
-            plugin.updatePlayerCoordinates(player, "Space")
-        }
-    }
     @EventHandler
     fun onPlayerSwapHandItems(event: PlayerSwapHandItemsEvent) {
         val player = event.player
-
         val bindKey = plugin.settingsConfig.getString("bind") ?: "F"
 
-        if (bindKey != "F") return
+        if (bindKey == "F" && player.isSneaking && plugin.settingsConfig.getBoolean("bind-enable", true)) {
+            event.isCancelled = true
+            plugin.api.bindActivator(player)
+        }
+    }
 
-        if (!player.isSneaking) return
-
-        event.isCancelled = true
-
-        if (!plugin.settingsConfig.getBoolean("bind-enable", true)) return
-
-        plugin.api.bindActivator(player)
+    private fun disableNavigationIfActive(player: Player) {
+        val state = plugin.playerStates[player.name] ?: return
+        if (state.navigationMode) {
+            plugin.closeNavigation(player)
+        }
     }
 }

@@ -3,14 +3,16 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitRunnable
 import top.eternal.neyran.movementUI.MovementsMain
 import top.eternal.neyran.movementUI.PlayerState
 
 class ProtocolListener(private val plugin: MovementsMain) {
-
     private val protocolManager = ProtocolLibrary.getProtocolManager()
-
     fun registerPacketListeners() {
         protocolManager.addPacketListener(object : PacketAdapter(
             plugin,
@@ -27,25 +29,40 @@ class ProtocolListener(private val plugin: MovementsMain) {
         val player = event.player
         val state = plugin.playerStates[player.name] ?: return
 
-        val currentTime = System.currentTimeMillis()
-        if (state.navigationMode && (state.lastMoveTime == null || currentTime - state.lastMoveTime!! >= plugin.settingsConfig.getInt("detect-delay"))) {
+        if (state.navigationMode) {
+            val currentTime = System.currentTimeMillis()
+            val delay = plugin.settingsConfig.getInt("detect-delay")
+            if (state.lastMoveTime?.let { currentTime - it < delay } == true) return
+
             state.lastMoveTime = currentTime
-            handleSteering(event, state, player)
+            processMovement(event, state, player)
         }
     }
 
-    private fun handleSteering(event: PacketEvent, state: PlayerState, player: Player) {
+    private fun processMovement(event: PacketEvent, state: PlayerState, player: Player) {
         val packet = event.packet
-        val (sideways, forward) = packet.float.run { read(0) to read(1) }
-        val (isJumping, isDismounting) = packet.booleans.run { read(0) to read(1) }
+        val sideways = packet.float.read(0)
+        val forward = packet.float.read(1)
+        val isJumping = packet.booleans.read(0)
+        val isDismounting = packet.booleans.read(1)
+
+        if (plugin.settingsConfig.getBoolean("air_fix", true) && !player.isFlying) {
+            val blockBelow = player.location.add(0.0, -1.0, 0.0).block
+            if (blockBelow.type.isAirCompatible()) {
+                disableNavigationMode(state)
+                return
+            }
+        }
 
         if (isDismounting) {
             event.isCancelled = true
             plugin.updatePlayerCoordinates(player, "Shift")
+            state.lastKeyPressed = "Shift"
         }
 
         if (isJumping) {
             plugin.updatePlayerCoordinates(player, "Space")
+            state.lastKeyPressed = "Space"
         }
 
         val direction = when {
@@ -61,4 +78,17 @@ class ProtocolListener(private val plugin: MovementsMain) {
             plugin.updatePlayerCoordinates(player, it)
         }
     }
+
+    private fun disableNavigationMode(state: PlayerState) {
+        state.navigationMode = false
+        object : BukkitRunnable() {
+            override fun run() {
+                (Bukkit.getEntity(state.armorStand ?: return) as? ArmorStand)?.remove()
+                state.armorStand = null
+            }
+        }.runTaskLater(plugin, 5L)
+    }
+
+    private fun Material.isAirCompatible(): Boolean =
+        this == Material.AIR || this == Material.CAVE_AIR || this == Material.VOID_AIR
 }

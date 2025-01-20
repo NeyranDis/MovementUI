@@ -26,6 +26,7 @@ class MovementUI_API(private val plugin: MovementsMain) {
                 mapOf("menu" to state.currentMenu)
             )
         }
+
         val event = BindActivatorEvent(player)
         Bukkit.getServer().pluginManager.callEvent(event)
     }
