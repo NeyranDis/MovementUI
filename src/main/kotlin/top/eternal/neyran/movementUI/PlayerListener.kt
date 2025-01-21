@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 import org.spigotmc.event.entity.EntityDismountEvent
 
@@ -17,7 +18,6 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         plugin.playerStates[event.player.name] = PlayerState()
     }
-
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val playerName = event.player.name
@@ -29,12 +29,14 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             }
         }
     }
-
+    @EventHandler
+    fun onPlayerDead(event: PlayerDeathEvent) {
+        disableNavigationIfActive(event.player)
+    }
     @EventHandler
     fun onPlayerInteractWithEntity(event: PlayerInteractEntityEvent) {
         disableNavigationIfActive(event.player)
     }
-
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val clickedBlock = event.clickedBlock ?: return
@@ -42,7 +44,6 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             disableNavigationIfActive(event.player)
         }
     }
-
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
         val blockType = event.player.location.block.type
@@ -50,7 +51,6 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             disableNavigationIfActive(event.player)
         }
     }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onDismount(event: EntityDismountEvent) {
         if (event.entity is Player) {
@@ -61,12 +61,10 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             }
         }
     }
-
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
         disableNavigationIfActive(event.player)
     }
-
     @EventHandler
     fun onPlayerSwapHandItems(event: PlayerSwapHandItemsEvent) {
         val player = event.player
@@ -77,12 +75,10 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             plugin.api.bindActivator(player)
         }
     }
-
     private fun disableNavigationIfActive(player: Player) {
         val state = plugin.playerStates[player.name] ?: return
         if (state.navigationMode) {
             plugin.closeNavigation(player)
         }
     }
-
 }
