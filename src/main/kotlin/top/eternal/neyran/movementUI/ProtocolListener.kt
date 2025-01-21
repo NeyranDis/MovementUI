@@ -46,13 +46,6 @@ class ProtocolListener(private val plugin: MovementsMain) {
         val isJumping = packet.booleans.read(0)
         val isDismounting = packet.booleans.read(1)
 
-        if (plugin.settingsConfig.getBoolean("air_fix", true) && !player.isFlying) {
-            val blockBelow = player.location.add(0.0, -1.0, 0.0).block
-            if (blockBelow.type.isAirCompatible()) {
-                disableNavigationMode(state)
-                return
-            }
-        }
 
         if (isDismounting) {
             event.isCancelled = true

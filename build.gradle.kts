@@ -3,7 +3,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 group = "top.eternal.neyran.movementUI"
-version = "1.0.8.3"
+version = "1.0.8.4"
 
 repositories {
     mavenCentral()

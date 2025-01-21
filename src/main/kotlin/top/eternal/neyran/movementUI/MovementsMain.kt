@@ -5,6 +5,7 @@ import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -22,7 +23,7 @@ import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.0.8.3"
+    var vers = "1.0.8.4"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
     lateinit var customConfig: FileConfiguration
@@ -114,7 +115,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/21-15:12\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/21-16:27\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -250,6 +251,14 @@ class MovementsMain : JavaPlugin() {
         val state = playerStates.getOrPut(player.name) { PlayerState() }
 
         if (!state.navigationMode) {
+            if (settingsConfig.getBoolean("air_fix", true) && !player.isFlying) {
+                val blockBelow = player.location.add(0.0, -1.0, 0.0).block
+                if (blockBelow.type.isAirCompatible()) {
+                    closeNavigation(player)
+                    return
+                }
+            }
+
             state.navigationMode = true
             val world = player.world
             val location = player.location.clone().apply {
@@ -293,7 +302,8 @@ class MovementsMain : JavaPlugin() {
             }.runTaskLater(this, 5L)
         }
     }
-
+    private fun Material.isAirCompatible(): Boolean =
+        this == Material.AIR || this == Material.CAVE_AIR || this == Material.VOID_AIR
     fun closeNavigation(player: Player) {
         val state = playerStates.getOrPut(player.name) { PlayerState() }
 
