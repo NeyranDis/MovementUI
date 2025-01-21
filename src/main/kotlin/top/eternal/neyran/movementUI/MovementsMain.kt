@@ -22,7 +22,7 @@ import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.0.8.2"
+    var vers = "1.0.8.3"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
     lateinit var customConfig: FileConfiguration
@@ -114,7 +114,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/20-21:39\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/21-15:12\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -154,13 +154,20 @@ class MovementsMain : JavaPlugin() {
                             return true
                         }
 
-                        if (sender is Player && !sender.hasPermission("movementui.startmenu")) {
+                        if (sender is Player && !sender.isOp && !sender.hasPermission("movementui.startmenu")) {
+                            sender.sendMessage(
+                                langConfig.getString("plugin.tag")?.toMiniMessageComponent()
+                                    ?.append(langConfig.getString("no.permissions")?.toMiniMessageComponent()
+                                        ?: Component.text(""))
+                                    ?: Component.text("")
+                            )
                             return true
                         }
 
                         startNavigation(targetPlayer, menuName)
                     }
                 }
+
                 "closemenu" -> {
                     val targetPlayerName = args.getOrNull(1)
 
@@ -182,7 +189,13 @@ class MovementsMain : JavaPlugin() {
                         return true
                     }
 
-                    if (sender is Player && !sender.hasPermission("movementui.closemenu")) {
+                    if (sender is Player && !sender.isOp && !sender.hasPermission("movementui.closemenu")) {
+                        sender.sendMessage(
+                            langConfig.getString("plugin.tag")?.toMiniMessageComponent()
+                                ?.append(langConfig.getString("no.permissions")?.toMiniMessageComponent()
+                                    ?: Component.text(""))
+                                ?: Component.text("")
+                        )
                         return true
                     }
 
@@ -190,7 +203,7 @@ class MovementsMain : JavaPlugin() {
                 }
 
                 "reload" -> {
-                    if (sender.hasPermission("movementui.reload")) {
+                    if (sender is ConsoleCommandSender || sender.isOp || sender.hasPermission("movementui.reload")) {
                         reloadConfigs()
                         val message = (Component.text()
                             .append(langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
@@ -210,6 +223,7 @@ class MovementsMain : JavaPlugin() {
         }
         return false
     }
+
     private fun updateSettingsVersion(newVersion: String) {
         val currentVersion = settingsConfig.getString("version")
 

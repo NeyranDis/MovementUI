@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.toxicity188.BetterHud:fabric-api:1.9" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="com.github.toxicity188.BetterHud" artifactId="fabric-api" version="1.9" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.toxicity188.BetterHud/fabric-api/1.9/ffd5e16fc1c0c8422ed1067d9961a46f3c516761/fabric-api-1.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

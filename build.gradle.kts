@@ -3,7 +3,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 group = "top.eternal.neyran.movementUI"
-version = "1.0.8.2"
+version = "1.0.8.3"
 
 repositories {
     mavenCentral()
@@ -22,7 +22,7 @@ repositories {
 }
 dependencies {
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation ("org.bstats:bstats-bukkit:3.1.0")
     compileOnly("com.github.toxicity188:BetterHud:1.9")

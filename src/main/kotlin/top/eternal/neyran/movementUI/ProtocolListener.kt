@@ -13,16 +13,37 @@ import top.eternal.neyran.movementUI.PlayerState
 
 class ProtocolListener(private val plugin: MovementsMain) {
     private val protocolManager = ProtocolLibrary.getProtocolManager()
+
     fun registerPacketListeners() {
+        // Проверяем версию сервера для корректной настройки Listener
         protocolManager.addPacketListener(object : PacketAdapter(
             plugin,
             ListenerPriority.HIGHEST,
             PacketType.Play.Client.STEER_VEHICLE
         ) {
             override fun onPacketReceiving(event: PacketEvent) {
-                handlePacket(event)
+                if (Bukkit.getBukkitVersion().startsWith("1.20")) {
+                    handlePacketFor1_20(event)
+                } else {
+                    handlePacket(event)
+                }
             }
         })
+    }
+
+    private fun handlePacketFor1_20(event: PacketEvent) {
+        val player = event.player
+        val state = plugin.playerStates[player.name] ?: return
+
+        // Аналогичная проверка для старшей версии 1.20
+        if (state.navigationMode) {
+            val currentTime = System.currentTimeMillis()
+            val delay = plugin.settingsConfig.getInt("detect-delay")
+            if (state.lastMoveTime?.let { currentTime - it < delay } == true) return
+
+            state.lastMoveTime = currentTime
+            processMovement(event, state, player)
+        }
     }
 
     private fun handlePacket(event: PacketEvent) {

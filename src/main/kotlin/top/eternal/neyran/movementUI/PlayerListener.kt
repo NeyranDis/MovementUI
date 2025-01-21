@@ -8,8 +8,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.entity.EntityDismountEvent
 import org.bukkit.event.player.*
+import org.spigotmc.event.entity.EntityDismountEvent
 
 class PlayerListener(private val plugin: MovementsMain) : Listener {
 
@@ -72,7 +72,7 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
         val player = event.player
         val bindKey = plugin.settingsConfig.getString("bind") ?: "F"
 
-        if (bindKey == "F" && player.isSneaking && plugin.settingsConfig.getBoolean("bind-enable", true)) {
+        if (bindKey.equals("F", ignoreCase = true) && player.isSneaking && plugin.settingsConfig.getBoolean("bind-enable", true)) {
             event.isCancelled = true
             plugin.api.bindActivator(player)
         }
@@ -84,4 +84,5 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             plugin.closeNavigation(player)
         }
     }
+
 }

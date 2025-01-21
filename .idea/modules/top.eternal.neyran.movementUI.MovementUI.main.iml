@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="MovementUI:main" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="top.eternal.neyran.movementUI" external.system.module.type="sourceSet" external.system.module.version="1.0.8.3" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="minecraft" name="Minecraft">
+      <configuration>
+        <autoDetectTypes>
+          <platformType>PAPER</platformType>
+          <platformType>ADVENTURE</platformType>
+        </autoDetectTypes>
+        <projectReimportVersion>1</projectReimportVersion>
+      </configuration>
+    </facet>
+    <facet external-system-id="GRADLE" type="kotlin-language" name="Kotlin">
+      <configuration version="5" platform="JVM 21" allPlatforms="JVM [21]" useProjectSettings="false">
+        <compilerArguments>
+          <flagArguments>
+            <flagArg name="allowNoSourceFiles" arg="true" />
+            <flagArg name="noReflect" arg="true" />
+            <flagArg name="noStdlib" arg="true" />
+          </flagArguments>
+          <stringArguments>
+            <stringArg name="destination" arg="$MODULE_DIR$/../../build/classes/kotlin/main" />
+            <stringArg name="jvmTarget" arg="21" />
+            <stringArg name="moduleName" arg="MovementUI" />
+            <stringArg name="apiVersion" arg="2.1" />
+            <stringArg name="languageVersion" arg="2.1" />
+          </stringArguments>
+          <arrayArguments>
+            <arrayArg name="pluginClasspaths">
+              <args>
+                <arg>$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/2.1.0-RC/dc09da1a3329dd5c06ea35c3c4657856ee00116d/kotlin-scripting-jvm-2.1.0-RC.jar</arg>
+                <arg>$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/2.1.0-RC/228dd951cd73a060ddbd440cce148f2ae98a6292/kotlin-scripting-common-2.1.0-RC.jar</arg>
+                <arg>$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.0-RC/ed98ece317a878e4f67a7adf93196fd8fe8a3a91/kotlin-stdlib-2.1.0-RC.jar</arg>
+                <arg>$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar</arg>
+                <arg>$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.0-RC/8d0cdb02311a1962e2f94110a71a3337095829ae/kotlin-script-runtime-2.1.0-RC.jar</arg>
+              </args>
+            </arrayArg>
+            <arrayArg name="pluginOptions" />
+          </arrayArguments>
+        </compilerArguments>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../../build/classes/kotlin/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../src/main/kotlin" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../src/main/resources" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../libs/PlaceholderAPI-2.11.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.comphenix.protocol:ProtocolLib:5.1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.github.toxicity188:BetterHud:1.9" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.18.34" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0-RC" level="project" />
+    <orderEntry type="library" name="Gradle: org.bstats:bstats-bukkit:3.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-platform-bukkit:4.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-text-serializer-legacy:4.14.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-text-minimessage:4.14.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-api:4.14.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: net.kyori:adventure-text-logger-slf4j:4.14.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-text-serializer-gson:4.14.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: net.kyori:adventure-text-serializer-plain:4.14.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: net.md-5:bungeecord-chat:1.20-R0.1-deprecated+build.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.guava:guava:31.1-jre" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.code.gson:gson:2.10" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.yaml:snakeyaml:2.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.joml:joml:1.10.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: it.unimi.dsi:fastutil:8.5.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.logging.log4j:log4j-api:2.17.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven:maven-resolver-provider:3.8.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:slf4j-api:1.8.0-beta4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.checkerframework:checker-qual:3.21.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.github.toxicity188.BetterHud:bukkit-api:1.9" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.github.toxicity188.BetterHud:fabric-api:1.9" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.github.toxicity188.BetterHud:standard-api:1.9" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.github.toxicity188.BetterHud:velocity-api:1.9" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0-RC" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:2.1.0-RC" level="project" />
+    <orderEntry type="library" name="Gradle: org.bstats:bstats-base:3.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-nbt:4.14.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-platform-api:4.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-text-serializer-bungeecord:4.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-key:4.14.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:examination-string:1.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:examination-api:1.3.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:24.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: net.kyori:adventure-text-serializer-json:4.14.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.guava:failureaccess:1.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.code.findbugs:jsr305:3.0.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.errorprone:error_prone_annotations:2.11.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.j2objc:j2objc-annotations:1.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven.resolver:maven-resolver-impl:1.6.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven:maven-model-builder:3.8.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven:maven-model:3.8.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven:maven-repository-metadata:3.8.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven.resolver:maven-resolver-spi:1.6.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven.resolver:maven-resolver-util:1.6.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven.resolver:maven-resolver-api:1.6.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.codehaus.plexus:plexus-utils:3.3.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: javax.inject:javax.inject:1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.commons:commons-lang3:3.8.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven:maven-artifact:3.8.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.codehaus.plexus:plexus-interpolation:1.26" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.maven:maven-builder-support:3.8.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.6.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.kyori:adventure-text-serializer-gson-legacy-impl:4.13.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.kyori:adventure-platform-viaversion:4.3.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.kyori:adventure-platform-facet:4.3.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
+  </component>
+</module>

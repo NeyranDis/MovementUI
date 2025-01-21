@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.bstats:bstats-bukkit:3.1.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.bstats" artifactId="bstats-bukkit" version="3.1.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bstats/bstats-bukkit/3.1.0/d093654514502a129df848e2aed396c9981a5e1e/bstats-bukkit-3.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
