@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
@@ -61,10 +62,33 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
             }
         }
     }
+
+    @EventHandler
+    fun onPlayerClick(event: PlayerInteractEvent) {
+        val player = event.player
+        val action = event.action
+
+        if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+            val menuName = getCurrentMenuName(player)
+
+            val clickDetectEnabled = plugin.customConfig.getBoolean("$menuName.click_detect", false)
+
+            if (clickDetectEnabled) {
+                plugin.updatePlayerCoordinates(player, "Space")
+            }
+        }
+    }
+
+    fun getCurrentMenuName(player: Player): String {
+        val state = plugin.playerStates[player.name] ?: return ""
+        return state.currentMenu
+    }
+
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
         disableNavigationIfActive(event.player)
     }
+
     @EventHandler
     fun onPlayerSwapHandItems(event: PlayerSwapHandItemsEvent) {
         val player = event.player

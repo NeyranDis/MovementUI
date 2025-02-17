@@ -7,7 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
-class MovementTabCompleter(private val configFile: File) : TabCompleter {
+class MovementTabCompleter(private val menusDir: File) : TabCompleter {
     override fun onTabComplete(
         sender: CommandSender,
         command: Command,
@@ -21,8 +21,7 @@ class MovementTabCompleter(private val configFile: File) : TabCompleter {
                 }
                 2 -> {
                     if (args[0].equals("startmenu", ignoreCase = true)) {
-                        val menusConfig: FileConfiguration = YamlConfiguration.loadConfiguration(configFile)
-                        menusConfig.getKeys(false).filter { it.startsWith(args[1], ignoreCase = true) }.toList()
+                        loadAllMenuNames().filter { it.startsWith(args[1], ignoreCase = true) }
                     } else {
                         null
                     }
@@ -31,5 +30,17 @@ class MovementTabCompleter(private val configFile: File) : TabCompleter {
             }
         }
         return null
+    }
+
+    private fun loadAllMenuNames(): List<String> {
+        if (!menusDir.exists() || !menusDir.isDirectory) return emptyList()
+
+        return menusDir.listFiles { file -> file.extension.equals("yml", ignoreCase = true) }
+            ?.flatMap { file ->
+                val config: FileConfiguration = YamlConfiguration.loadConfiguration(file)
+                config.getKeys(false)
+            }
+            ?.distinct()
+            ?: emptyList()
     }
 }

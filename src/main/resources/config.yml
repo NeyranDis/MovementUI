@@ -1,8 +1,8 @@
-version: 1.0.8.2
-bStats: true
+version: 1.1
 debug: false
 default_menu: default
-detect-delay: 150
+scroll-detect-delay: 40
+detect-delay: 140
 air_fix: true
 bind-enable: true
 bind-command: false

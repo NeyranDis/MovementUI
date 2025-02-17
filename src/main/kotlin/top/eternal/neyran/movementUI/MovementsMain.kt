@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.file.FileConfigurationOptions
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
@@ -23,7 +24,7 @@ import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.0.8.4"
+    var vers = "1.1"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
     lateinit var customConfig: FileConfiguration
@@ -80,10 +81,11 @@ class MovementsMain : JavaPlugin() {
     lateinit var api: MovementUI_API
     override fun onEnable() {
         saveDefaultConfig()
+
         settingsFile = File(dataFolder, "config.yml")
         bindFile = File(dataFolder, "bind.yml")
-        configFile = File(dataFolder, "menus.yml")
         langFile = File(dataFolder, "lang.yml")
+        val menusDir = File(dataFolder, "menus")
 
         if (!settingsFile.exists()) {
             saveResource("config.yml", false)
@@ -91,17 +93,22 @@ class MovementsMain : JavaPlugin() {
         if (!bindFile.exists()) {
             saveResource("bind.yml", false)
         }
-        if (!configFile.exists()) {
-            saveResource("menus.yml", false)
-        }
         if (!langFile.exists()) {
             saveResource("lang.yml", false)
         }
-        customConfig = YamlConfiguration.loadConfiguration(configFile)
+        if (!menusDir.exists()) {
+            menusDir.mkdirs()
+            saveResource("menus/default_menus.yml", false)
+        }
+
+        configFile = menusDir
+        customConfig = loadVirtualConfig(menusDir)
+
         bindConfig = YamlConfiguration.loadConfiguration(bindFile)
         settingsConfig = YamlConfiguration.loadConfiguration(settingsFile)
         langConfig = YamlConfiguration.loadConfiguration(langFile)
         updateSettingsVersion("$vers")
+
         val protocolListener = ProtocolListener(this)
         protocolListener.registerPacketListeners()
         server.pluginManager.registerEvents(PlayerListener(this), this)
@@ -115,7 +122,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/1/21-16:27\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/2/17-17:35\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -224,7 +231,20 @@ class MovementsMain : JavaPlugin() {
         }
         return false
     }
+    private fun loadVirtualConfig(dir: File): YamlConfiguration {
+        val config = YamlConfiguration()
+        val configs = dir.listFiles { _, name -> name.endsWith(".yml") }
+            ?.map { YamlConfiguration.loadConfiguration(it) } ?: emptyList()
 
+        configs.forEach { yaml ->
+            yaml.getKeys(true).forEach { key ->
+                if (!config.isSet(key)) {
+                    config.set(key, yaml.get(key))
+                }
+            }
+        }
+        return config
+    }
     private fun updateSettingsVersion(newVersion: String) {
         val currentVersion = settingsConfig.getString("version")
 
@@ -259,10 +279,21 @@ class MovementsMain : JavaPlugin() {
                 }
             }
 
+            val origin = customConfig.getConfigurationSection(menuName)
+                ?.getString("origin", "0 0 0")
+                ?.split(" ")
+                ?.mapNotNull { it.toIntOrNull() }
+                ?: listOf(0, 0, 0)
+
+            state.x = origin.getOrElse(0) { 0 }
+            state.y = origin.getOrElse(1) { 0 }
+            state.z = origin.getOrElse(2) { 0 }
+            state.currentMenu = menuName
+
             state.navigationMode = true
             val world = player.world
             val location = player.location.clone().apply {
-                y += 1
+                y += 0.6
             }
 
             val armorStand = world.spawn(location, ArmorStand::class.java).apply {
@@ -286,24 +317,15 @@ class MovementsMain : JavaPlugin() {
                         processBindCommands(player, "bind_enter")
                     }
 
-                    val origin = customConfig.getConfigurationSection(menuName)
-                        ?.getString("origin", "0 0 0")
-                        ?.split(" ")
-                        ?.mapNotNull { it.toIntOrNull() }
-                        ?: listOf(0, 0, 0)
-
-                    state.x = origin.getOrElse(0) { 0 }
-                    state.y = origin.getOrElse(1) { 0 }
-                    state.z = origin.getOrElse(2) { 0 }
-                    state.currentMenu = menuName
-
                     sendDebugMessage(player, langConfig.getString("debug.navigation.enter") ?: "", mapOf("menu" to state.currentMenu))
                 }
             }.runTaskLater(this, 5L)
         }
     }
+
     private fun Material.isAirCompatible(): Boolean =
         this == Material.AIR || this == Material.CAVE_AIR || this == Material.VOID_AIR
+
     fun closeNavigation(player: Player) {
         val state = playerStates.getOrPut(player.name) { PlayerState() }
 
@@ -330,11 +352,12 @@ class MovementsMain : JavaPlugin() {
 
 
     private fun reloadConfigs() {
-        customConfig = YamlConfiguration.loadConfiguration(configFile)
+        customConfig = loadVirtualConfig(File(dataFolder, "menus"))
         bindConfig = YamlConfiguration.loadConfiguration(bindFile)
         settingsConfig = YamlConfiguration.loadConfiguration(settingsFile)
         langConfig = YamlConfiguration.loadConfiguration(langFile)
     }
+
     fun processBindCommands(player: Player, bindType: String) {
         val bindSection = bindConfig.getConfigurationSection(bindType)
         if (bindSection != null) {
@@ -511,7 +534,7 @@ class MovementsMain : JavaPlugin() {
             val targetY = commandSection.getInt("targetY")
             val targetZ = commandSection.getInt("targetZ")
 
-            if (state.x == targetX && state.y == targetY && state.z == targetZ) {
+            if (state.x == targetX && state.y == targetY && state.z == targetZ && isCoordConditionMet(state, player)) {
                 findAndExecuteCommands(commandSection, player, state)
                 return
             }
@@ -577,6 +600,28 @@ class MovementsMain : JavaPlugin() {
         }
     }
 
+    private fun isCoordConditionMet(state: PlayerState, player: Player): Boolean {
+        val menuName = state.currentMenu
+        val menuSection = customConfig.getConfigurationSection(menuName) ?: return false
+
+        for (key in menuSection.getKeys(false)) {
+            if (key in setOf("enabledCoordinates", "blockedCoordinates", "permission")) {
+                continue
+            }
+
+            val commandSection = menuSection.getConfigurationSection(key) ?: continue
+
+            val targetX = commandSection.getInt("targetX", -999)
+            val targetY = commandSection.getInt("targetY", -999)
+            val targetZ = commandSection.getInt("targetZ", -999)
+
+            if (state.x == targetX && state.y == targetY && state.z == targetZ) {
+                val conditionsSection = commandSection.getConfigurationSection("panel_conditions")
+                return conditionsSection?.let { evaluateConditions(it, player) } ?: true
+            }
+        }
+        return true
+    }
     private fun executeCommand(command: String, player: Player, executionType: String) {
         Bukkit.getScheduler().runTask(this, Runnable {
             when (executionType) {
@@ -604,29 +649,6 @@ class MovementsMain : JavaPlugin() {
         return conditionsSection?.let { evaluateConditions(it, player) } ?: true
     }
 
-    private fun isCoordConditionMet(state: PlayerState, player: Player): Boolean {
-        val menuName = state.currentMenu
-        val menuSection = customConfig.getConfigurationSection(menuName) ?: return false
-
-        for (key in menuSection.getKeys(false)) {
-            if (key in setOf("enabledCoordinates", "blockedCoordinates", "permission")) {
-                continue
-            }
-
-            val commandSection = menuSection.getConfigurationSection(key) ?: continue
-
-            val targetX = commandSection.getInt("targetX", -999)
-            val targetY = commandSection.getInt("targetY", -999)
-            val targetZ = commandSection.getInt("targetZ", -999)
-
-            if (state.x == targetX && state.y == targetY && state.z == targetZ) {
-                val conditionsSection = commandSection.getConfigurationSection("panel_conditions")
-                return conditionsSection?.let { evaluateConditions(it, player) } ?: true
-            }
-        }
-        return true
-    }
-
     private fun evaluateConditions(conditionsSection: ConfigurationSection, player: Player): Boolean {
         var finalResult = true
 
@@ -644,7 +666,7 @@ class MovementsMain : JavaPlugin() {
             val result = compareValues(firstValue, secondValue, operation)
 
             finalResult = applyGateLogic(finalResult, result, gate)
-            if (!finalResult && gate == "and") return false // Оптимизация: прерываем цикл для AND.
+            if (!finalResult && gate == "and") return false
         }
 
         return finalResult
@@ -654,7 +676,7 @@ class MovementsMain : JavaPlugin() {
         return when (gate) {
             "and" -> currentResult && newResult
             "or" -> currentResult || newResult
-            else -> currentResult // Если gate не задано, логика не изменяется.
+            else -> currentResult
         }
     }
 
@@ -674,11 +696,11 @@ class MovementsMain : JavaPlugin() {
         }
     }
 
+
     fun sendDebugMessage(player: Player, message: String, placeholders: Map<String, String>? = null) {
         if (settingsConfig.getBoolean("debug", false)) {
             var formattedMessage = message
 
-            // Если placeholders не null, выполняем замену
             placeholders?.forEach { (key, value) ->
                 formattedMessage = formattedMessage.replace("{$key}", value)
             }
