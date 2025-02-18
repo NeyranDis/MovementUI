@@ -67,28 +67,32 @@ class PlayerListener(private val plugin: MovementsMain) : Listener {
     fun onPlayerClick(event: PlayerInteractEvent) {
         val player = event.player
         val action = event.action
+        val state = plugin.playerStates[player.name] ?: return
+        if (state.navigationMode) {
+            if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+                val menuName = state.currentMenu
 
-        if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-            val menuName = getCurrentMenuName(player)
+                val clickDetectEnabled = plugin.customConfig.getBoolean("$menuName.click_detect", false)
 
-            val clickDetectEnabled = plugin.customConfig.getBoolean("$menuName.click_detect", false)
-
-            if (clickDetectEnabled) {
-                plugin.updatePlayerCoordinates(player, "Space")
+                if (clickDetectEnabled) {
+                    plugin.updatePlayerCoordinates(player, "Space")
+                }
             }
         }
-    }
-
-    fun getCurrentMenuName(player: Player): String {
-        val state = plugin.playerStates[player.name] ?: return ""
-        return state.currentMenu
     }
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
         disableNavigationIfActive(event.player)
     }
-
+    @EventHandler
+    fun onHotbarSwitch(event: PlayerItemHeldEvent) {
+        val player = event.player
+        val state = plugin.playerStates[player.name] ?: return
+        if (state.navigationMode) {
+            event.isCancelled = true
+        }
+    }
     @EventHandler
     fun onPlayerSwapHandItems(event: PlayerSwapHandItemsEvent) {
         val player = event.player

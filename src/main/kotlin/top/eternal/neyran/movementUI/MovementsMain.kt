@@ -24,7 +24,7 @@ import java.io.File
 import java.util.regex.Pattern
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.1"
+    var vers = "1.1.1"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
     lateinit var configFile: File
     lateinit var customConfig: FileConfiguration
@@ -122,7 +122,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/2/17-17:35\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/2/18-15:37\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
