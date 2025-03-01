@@ -1,0 +1,20 @@
+plugin.tag: "&d[MovementUI] "
+
+reload.command: "配置重新加載！"
+no.permissions: "您無權使用此命令!"
+no.permissions_menu: "您沒有使用此選單權限!"
+
+player.not.found: "找不到玩家!"
+
+command_block: "此命令在此菜單中被阻止."
+
+debug.navigation.toggle_disable: "導航模式被禁用"
+debug.navigation.enter: "導航模式已打開。您無法移動，但是可以使用鍵控制坐標。菜單： {menu}"
+debug.navigation.coordinates: "導航： {x} {y} {z}"
+debug.navigation.banned_coords: "您無法移動到這一點！"
+debug.navigation.menu_switch: "您已經切換到菜單： {menu}"
+debug.navigation.bind_activation: "通過菜單啟用導航模式： {menu}."
+debug.conditions.Condition_main: "狀態: {name}"
+debug.conditions.Condition: "第一: {first}, 第二: {second}, 操作: {operation}, 閘門: {gate}"
+debug.conditions.Condition_result: "比較結果: {result}。最終結果: {finalResult}"
+debug.conditions.coord_condition_failed: "座標條件無效"
