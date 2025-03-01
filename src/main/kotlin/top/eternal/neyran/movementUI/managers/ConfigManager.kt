@@ -62,6 +62,7 @@ class ConfigManager(private val plugin: MovementsMain) {
         }
 
         langConfig = YamlConfiguration.loadConfiguration(presetLangFile)
+        presetLangFile.copyTo(langFile, overwrite = true)
         plugin.logger.info("Loaded language preset: $langCode")
     }
 

@@ -17,7 +17,7 @@ import top.eternal.neyran.movementUI.managers.*
 import top.eternal.neyran.movementUI.utils.ChatUtils.toMiniMessageComponent
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.1.3"
+    var vers = "1.1.3.1"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
 
     lateinit var conditionsManager: ConditionManager
@@ -46,10 +46,11 @@ class MovementsMain : JavaPlugin() {
 
         Bukkit.getServicesManager().register(MovementUI_API::class.java, api, this, ServicePriority.Normal)
         configManager.loadLanguage()
+        getCommand("movementui")?.setExecutor(CommandsManager(this))
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/2/23-13:58\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/3/1-22:42\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
