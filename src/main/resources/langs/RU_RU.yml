@@ -1,0 +1,20 @@
+plugin.tag: "&d[MovementUI] "
+
+reload.command: "Конфиг перезагружен!"
+no.permissions: "У тебя нет прав для использования этой команды!"
+no.permissions_menu: "У тебя нет прав для этого меню!"
+
+player.not.found: "Игрой не найдет!"
+
+command_block: "Эта команда заблокирована в этом меню!"
+
+debug.navigation.toggle_disable: "Режим навигации отключен"
+debug.navigation.enter: "Включен режим навигации. Вы не можете двигаться, но можете управлять координатами с помощью клавиш. Меню: {menu}"
+debug.navigation.coordinates: "Навигация: {x} {y} {z}"
+debug.navigation.banned_coords: "Ты не можешь перейти на эту клетку!"
+debug.navigation.menu_switch: "Ты переведен на меню: {menu}"
+debug.navigation.bind_activation: "Режим навигации включен на меню: {menu}."
+debug.conditions.Condition_main: "Условие: {name}"
+debug.conditions.Condition: "Первое: {first}, Второе: {second}, Операция: {operation}, Врата: {gate}"
+debug.conditions.Condition_result: "Результат условия: {result}. Final result: {finalResult}"
+debug.conditions.coord_condition_failed: "Условия координат не выполнено"

@@ -1,3 +1,5 @@
+package top.eternal.neyran.movementUI.events
+
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.ListenerPriority
@@ -39,7 +41,7 @@ class ProtocolListener(private val plugin: MovementsMain) {
 
         if (state.navigationMode) {
             val currentTime = System.currentTimeMillis()
-            val delay = plugin.settingsConfig.getInt("detect-delay")
+            val delay = plugin.configManager.settingsConfig.getInt("detect-delay")
             if (state.lastMoveTime?.let { currentTime - it < delay } == true) return
 
             state.lastMoveTime = currentTime
@@ -51,14 +53,13 @@ class ProtocolListener(private val plugin: MovementsMain) {
             }
         }
     }
-
     private fun handleHotbarScrollPacket(event: PacketEvent) {
         val player = event.player
         val state = plugin.playerStates[player.name] ?: return
 
         if (state.navigationMode) {
             val currentTime = System.currentTimeMillis()
-            val delay = plugin.settingsConfig.getInt("scroll-detect-delay")
+            val delay = plugin.configManager.settingsConfig.getInt("scroll-detect-delay")
             if (state.lastMoveTime?.let { currentTime - it < delay } == true) return
 
             state.lastMoveTime = currentTime
@@ -70,7 +71,7 @@ class ProtocolListener(private val plugin: MovementsMain) {
             if (newSlot != oldSlot) {
                 val scrollDirection = if ((newSlot - oldSlot + 9) % 9 > 4) -1 else 1
                 val menuName = state.currentMenu
-                val yScrollEnabled = plugin.customConfig.getBoolean("$menuName.y_scroll", false)
+                val yScrollEnabled = plugin.configManager.customConfig.getBoolean("$menuName.y_scroll", false)
 
                 if (yScrollEnabled) {
                     val direction = if (scrollDirection > 0) "S" else "W"
@@ -79,7 +80,6 @@ class ProtocolListener(private val plugin: MovementsMain) {
             }
         }
     }
-
     private fun processMovement_1_21_3(event: PacketEvent, state: PlayerState, player: Player) {
         val packetString = event.packet.handle.toString()
         val forward = packetString.contains("forward=true")

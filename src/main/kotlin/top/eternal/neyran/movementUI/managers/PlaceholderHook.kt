@@ -1,7 +1,8 @@
-package top.eternal.neyran.movementUI
+package top.eternal.neyran.movementUI.managers
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.entity.Player
+import top.eternal.neyran.movementUI.MovementsMain
 
 class PlaceholderHook(private val plugin: MovementsMain) : PlaceholderExpansion() {
     override fun getIdentifier(): String = "movementui"

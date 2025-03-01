@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="03ce5f28-afad-4947-9029-9dd4a778bb0b" name="Changes" comment="1.0.8.3 - Version Fix">
+    <list default="true" id="03ce5f28-afad-4947-9029-9dd4a778bb0b" name="Changes" comment="1.1.3 - Code refactoring, Command blacklist, Disabling block interactivity, language presets.">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_comphenix_protocol_ProtocolLib_5_3_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/managers/CommandsManager.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/managers/ConditionManager.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/managers/ConfigManager.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/managers/ExecutiveManager.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/utils/ChatUtils.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/langs/EN_US.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/langs/ES_ES.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/langs/RU_RU.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/langs/ZH_CN.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/langs/ZH_TW.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.8/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/checksums/checksums.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.8/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/fileHashes/fileHashes.bin" afterDir="false" />
@@ -12,13 +24,20 @@
       <change beforePath="$PROJECT_DIR$/.gradle/8.8/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.8/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_comphenix_protocol_ProtocolLib_5_1_0.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/MovementUI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/MovementUI.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.test.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/top.eternal.neyran.movementUI.MovementUI.test.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/MovementUI_API.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/api/MovementUI_API.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/MovementsMain.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/MovementsMain.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/ProtocolListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/ProtocolListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/PlaceholderHook.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/managers/PlaceholderHook.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/PlayerListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/events/PlayerListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/ProtocolListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/top/eternal/neyran/movementUI/events/ProtocolListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/lang.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/lang.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/plugin.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -101,17 +120,19 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Gradle.Download Sources.executor": "Run",
     "Gradle.MovementUI [buildDependents].executor": "Run",
     "Gradle.MovementUI [buildNeeded].executor": "Run",
     "Gradle.MovementUI [build].executor": "Run",
     "Gradle.MovementUI [classes].executor": "Run",
     "Gradle.MovementUI [clean].executor": "Run",
+    "Gradle.MovementUI [jar].executor": "Run",
     "Gradle.MovementUI [wrapper].executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Max/Desktop/MovementUI",
+    "last_opened_file_path": "C:/Users/Max/Desktop/MovementUI/src/main/resources/langs",
     "settings.editor.selected.configurable": "editor.preferences.smartKeys"
   },
   "keyToStringList": {
@@ -122,8 +143,17 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Max\Desktop\MovementUI\src\main\resources\langs" />
       <recent name="C:\Users\Max\Desktop\MovementUI\libs" />
       <recent name="C:\Users\Max\Desktop\MovementUI\src\main\resources" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Max\Desktop\MovementUI\src\main\resources\menus" />
+    </key>
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="top.eternal.neyran.movementUI.managers" />
+      <recent name="top.eternal.neyran.movementUI.events" />
+      <recent name="top.eternal.neyran.movementUI.api" />
     </key>
   </component>
   <component name="RunManager" selected="Gradle.MovementUI [build]">
@@ -139,28 +169,6 @@
         <option name="taskNames">
           <list>
             <option value="buildDependents" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="MovementUI [buildNeeded]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="buildNeeded" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -237,6 +245,28 @@
       <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
+    <configuration name="MovementUI [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="jar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="mcdev-temp-root" />
       <method v="2">
@@ -254,9 +284,9 @@
       <list>
         <item itemvalue="Gradle.MovementUI [build]" />
         <item itemvalue="Gradle.MovementUI [clean]" />
-        <item itemvalue="Gradle.MovementUI [classes]" />
-        <item itemvalue="Gradle.MovementUI [buildNeeded]" />
+        <item itemvalue="Gradle.MovementUI [jar]" />
         <item itemvalue="Gradle.MovementUI [buildDependents]" />
+        <item itemvalue="Gradle.MovementUI [classes]" />
       </list>
     </recent_temporary>
   </component>
@@ -389,7 +419,47 @@
       <option name="project" value="LOCAL" />
       <updated>1737465629047</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="1.0.8.4 - Air_fix Fix">
+      <option name="closed" value="true" />
+      <created>1737466166101</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1737466166101</updated>
+    </task>
+    <task id="LOCAL-00017" summary="1.0.8.4 - Death event patch">
+      <option name="closed" value="true" />
+      <created>1737468760103</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1737468760103</updated>
+    </task>
+    <task id="LOCAL-00018" summary="1.1 - Click parameter, Scroll detect, Menus folder update">
+      <option name="closed" value="true" />
+      <created>1739807080196</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1739807080196</updated>
+    </task>
+    <task id="LOCAL-00019" summary="1.1 - Click parameter, Scroll detect, Menus folder update">
+      <option name="closed" value="true" />
+      <created>1739807117943</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1739807117943</updated>
+    </task>
+    <task id="LOCAL-00020" summary="1.1.1 - click_detect fix, hotbar block">
+      <option name="closed" value="true" />
+      <created>1739886731207</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1739886731208</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -420,6 +490,11 @@
     <MESSAGE value="1.0.8.1 - Patch" />
     <MESSAGE value="1.0.8.2 - Optimization" />
     <MESSAGE value="1.0.8.3 - Version Fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="1.0.8.3 - Version Fix" />
+    <MESSAGE value="1.0.8.4 - Air_fix Fix" />
+    <MESSAGE value="1.0.8.4 - Death event patch" />
+    <MESSAGE value="1.1 - Click parameter, Scroll detect, Menus folder update" />
+    <MESSAGE value="1.1.1 - click_detect fix, hotbar block" />
+    <MESSAGE value="1.1.3 - Code refactoring, Command blacklist, Disabling block interactivity, language presets." />
+    <option name="LAST_COMMIT_MESSAGE" value="1.1.3 - Code refactoring, Command blacklist, Disabling block interactivity, language presets." />
   </component>
 </project>

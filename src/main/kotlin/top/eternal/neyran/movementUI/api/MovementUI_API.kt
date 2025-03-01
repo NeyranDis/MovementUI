@@ -1,42 +1,41 @@
-package top.eternal.neyran.movementUI
+package top.eternal.neyran.movementUI.api
 
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
+import top.eternal.neyran.movementUI.MovementsMain
 
 class MovementUI_API(private val plugin: MovementsMain) {
 
     /**
-     * Активирует или деактивирует режим навигации для игрока и вызывает событие BindActivatorEvent.
+     * Enables or disables navigation mode for the player and raises the BindActivatorEvent.
      *
-     * @param player Игрок, для которого выполняется метод.
+     * @param player The player for which the method is executed.
      */
     fun bindActivator(player: Player) {
         val state = plugin.playerStates[player.name] ?: return
-        val defaultMenu = plugin.settingsConfig.getString("default_menu") ?: "default"
+        val defaultMenu = plugin.configManager.settingsConfig.getString("default_menu") ?: "default"
 
-        // Проверяем режим навигации
         if (state.navigationMode) {
             plugin.closeNavigation(player)
         } else {
             plugin.startNavigation(player, defaultMenu)
             plugin.sendDebugMessage(
                 player,
-                plugin.langConfig.getString("debug.navigation.bind_activation") ?: "",
+                plugin.configManager.langConfig.getString("debug.navigation.bind_activation") ?: "",
                 mapOf("menu" to state.currentMenu)
             )
         }
 
-        // Вызываем пользовательское событие
         val event = BindActivatorEvent(player)
         Bukkit.getServer().pluginManager.callEvent(event)
     }
 
     /**
-     * Событие, вызываемое при активации привязки навигации.
+     * Event fired when a navigation anchor is activated.
      *
-     * @param player Игрок, активировавший привязку.
+     * @param player The player who activated the binding.
      */
     class BindActivatorEvent(val player: Player) : Event() {
         companion object {

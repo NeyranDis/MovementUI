@@ -1,0 +1,20 @@
+plugin.tag: "&d[MovementUI] "
+
+reload.command: "¡Configuración recargada!"
+no.permissions: "¡No tienes permiso para usar este comando!"
+no.permissions_menu: "¡No tienes permiso para este menú!"
+
+player.not.found: "¡Jugador no encontrado!"
+
+command_block: "Este comando está bloqueado en este menú."
+
+debug.navigation.toggle_disable: "El modo de navegación está desactivado."
+debug.navigation.enter: "El modo de navegación está activado. No puedes moverte, pero puedes controlar las coordenadas usando las teclas. Menú: {menu}"
+debug.navigation.coordinates: "Navegación: {x} {y} {z}"
+debug.navigation.banned_coords: "¡No puedes moverte a ese punto!"
+debug.navigation.menu_switch: "Has cambiado al menú: {menu}"
+debug.navigation.bind_activation: "Modo de navegación activado con el menú: {menu}."
+debug.conditions.Condition_main: "Condición: {name}"
+debug.conditions.Condition: "Primero: {first}, Segundo: {second}, Operación: {operation}, Compuerta lógica: {gate}"
+debug.conditions.Condition_result: "Resultado de comparación: {result}. Resultado final: {finalResult}"
+debug.conditions.coord_condition_failed: "No se cumple la condición de coordenadas."
