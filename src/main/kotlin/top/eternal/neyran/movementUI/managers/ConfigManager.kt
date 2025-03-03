@@ -4,6 +4,8 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import top.eternal.neyran.movementUI.MovementsMain
 import java.io.File
+import java.io.InputStreamReader
+
 
 class ConfigManager(private val plugin: MovementsMain) {
     lateinit var configFile: File
@@ -55,16 +57,18 @@ class ConfigManager(private val plugin: MovementsMain) {
         }
 
         val langCode = settingsConfig.getString("lang", "EN_US")
-        val presetLangFile = File(plugin.dataFolder, "langs/$langCode.yml")
+        val resourcePath = "langs/$langCode.yml"
 
-        if (!presetLangFile.exists()) {
-            plugin.saveResource("langs/$langCode.yml", false)
+        val inputStream = plugin.getResource(resourcePath)
+        if (inputStream != null) {
+            val reader = InputStreamReader(inputStream, Charsets.UTF_8)
+            langConfig = YamlConfiguration.loadConfiguration(reader)
+            plugin.logger.info("Loaded language preset: $langCode from JAR")
+        } else {
+            plugin.logger.warning("Language file $resourcePath not found in JAR!")
         }
-
-        langConfig = YamlConfiguration.loadConfiguration(presetLangFile)
-        presetLangFile.copyTo(langFile, overwrite = true)
-        plugin.logger.info("Loaded language preset: $langCode")
     }
+
 
      fun loadVirtualConfig(dir: File): YamlConfiguration {
         val config = YamlConfiguration()

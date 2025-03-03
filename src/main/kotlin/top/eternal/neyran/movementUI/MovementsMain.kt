@@ -17,7 +17,7 @@ import top.eternal.neyran.movementUI.managers.*
 import top.eternal.neyran.movementUI.utils.ChatUtils.toMiniMessageComponent
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.1.3.1"
+    var vers = "1.1.4"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
 
     lateinit var conditionsManager: ConditionManager
@@ -50,7 +50,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/3/1-22:42\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/3/3-15:51\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -81,11 +81,13 @@ class MovementsMain : JavaPlugin() {
                 }
             }
 
-            val origin = configManager.customConfig.getConfigurationSection(menuName)
-                ?.getString("origin", "0 0 0")
+            val menuConfig = configManager.customConfig.getConfigurationSection(menuName)
+            val origin = menuConfig?.getString("origin", "0 0 0")
                 ?.split(" ")
                 ?.mapNotNull { it.toIntOrNull() }
                 ?: listOf(0, 0, 0)
+
+            val standSpawn = menuConfig?.getBoolean("stand_spawn", true) ?: true
 
             state.x = origin.getOrElse(0) { 0 }
             state.y = origin.getOrElse(1) { 0 }
@@ -93,35 +95,36 @@ class MovementsMain : JavaPlugin() {
             state.currentMenu = menuName
 
             state.navigationMode = true
-            val world = player.world
-            val location = player.location.clone().apply {
-                y += 0.6
-            }
 
-            val armorStand = world.spawn(location, ArmorStand::class.java).apply {
-                isVisible = false
-                isSmall = true
-                isMarker = true
-                isInvulnerable = true
-                isCustomNameVisible = false
-                setGravity(false)
-                customName = "navigation_stand_${player.uniqueId}"
-                persistentDataContainer.set(key("navigationOwner"), PersistentDataType.STRING, player.uniqueId.toString())
-            }
+            if (standSpawn) {
+                val world = player.world
+                val location = player.location.clone().apply { y += 0.6 }
 
-            armorStand.addPassenger(player)
-
-            object : BukkitRunnable() {
-                override fun run() {
-                    state.armorStand = armorStand.uniqueId
-
-                    if (configManager.settingsConfig.getBoolean("bind-command", false)) {
-                        commandsManager.processBindCommands(player, "bind_enter")
-                    }
-
-                    sendDebugMessage(player, configManager.langConfig.getString("debug.navigation.enter") ?: "", mapOf("menu" to state.currentMenu))
+                val armorStand = world.spawn(location, ArmorStand::class.java).apply {
+                    isVisible = false
+                    isSmall = true
+                    isMarker = true
+                    isInvulnerable = true
+                    isCustomNameVisible = false
+                    setGravity(false)
+                    customName = "navigation_stand_${player.uniqueId}"
+                    persistentDataContainer.set(key("navigationOwner"), PersistentDataType.STRING, player.uniqueId.toString())
                 }
-            }.runTaskLater(this, 5L)
+
+                armorStand.addPassenger(player)
+
+                object : BukkitRunnable() {
+                    override fun run() {
+                        state.armorStand = armorStand.uniqueId
+
+                        if (configManager.settingsConfig.getBoolean("bind-command", false)) {
+                            commandsManager.processBindCommands(player, "bind_enter")
+                        }
+
+                        sendDebugMessage(player, configManager.langConfig.getString("debug.navigation.enter") ?: "", mapOf("menu" to state.currentMenu))
+                    }
+                }.runTaskLater(this, 5L)
+            }
         }
     }
     private fun Material.isAirCompatible(): Boolean =
