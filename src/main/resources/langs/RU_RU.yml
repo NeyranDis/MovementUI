@@ -3,6 +3,7 @@ plugin.tag: "&d[MovementUI] "
 reload.command: "Конфиг перезагружен!"
 no.permissions: "У тебя нет прав для использования этой команды!"
 no.permissions_menu: "У тебя нет прав для этого меню!"
+no.menu_conditions: "Вы не можете перейти на это меню!"
 
 player.not.found: "Игрой не найдет!"
 

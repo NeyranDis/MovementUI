@@ -17,8 +17,14 @@ class ExecutiveManager(private val plugin: MovementsMain) {
             return
         }
 
+        val conditionsSection = menuSection.getConfigurationSection("menu_conditions")
+        if (conditionsSection != null && !plugin.conditionsManager.evaluateConditions(conditionsSection, player)) {
+            plugin.sendDebugMessage(player, "Menu conditions not met.")
+            return
+        }
+
         for (key in menuSection.getKeys(false)) {
-            if (key == "enabledCoordinates" || key == "blockedCoordinates") continue
+            if (key in setOf("enabledCoordinates", "blockedCoordinates", "permission", "menu_conditions")) continue
 
             val commandSection = menuSection.getConfigurationSection(key) ?: continue
             val targetX = commandSection.getInt("targetX")
@@ -31,64 +37,80 @@ class ExecutiveManager(private val plugin: MovementsMain) {
             }
         }
     }
-     fun findAndExecuteCommands(section: ConfigurationSection, player: Player, state: PlayerState) {
+    fun findAndExecuteCommands(section: ConfigurationSection, player: Player, state: PlayerState) {
         val commands = section.getConfigurationSection("commands")
         val nextMenu = section.getString("nextMenu")
         val swap = section.getString("swap")
+        val teleport = section.getBoolean("teleport", false)
 
-        commands?.let {
-            it.getKeys(false).forEach { key ->
-                val command = it.getString("$key.command")
-                val executionType = it.getString("$key.executionType") ?: "player"
-                if (command != null && plugin.conditionsManager.isCommandConditionMet(it.getConfigurationSection(key)!!, player)) {
-                    executeCommand(command, player, executionType)
+        if (teleport) {
+            Bukkit.getScheduler().runTask(plugin, Runnable {
+                state.armorStand?.let { uuid ->
+                    val armorStand = Bukkit.getEntity(uuid)
+                    if (armorStand != null && armorStand.isValid) {
+                        armorStand.remove()
+                    }
+                    state.armorStand = null
+                }
+            })
+        }
+
+        Bukkit.getScheduler().runTaskLater(plugin, Runnable {
+            commands?.let {
+                it.getKeys(false).forEach { key ->
+                    val command = it.getString("$key.command")
+                    val executionType = it.getString("$key.executionType") ?: "player"
+                    if (command != null && plugin.conditionsManager.isCommandConditionMet(it.getConfigurationSection(key)!!, player)) {
+                        executeCommand(command, player, executionType)
+                    }
                 }
             }
-        }
 
-        swap?.let {
-            val swapCoordinates = it.split(" ").mapNotNull { it.toIntOrNull() }
-            if (swapCoordinates.size == 3) {
-                state.x = swapCoordinates[0]
-                state.y = swapCoordinates[1]
-                state.z = swapCoordinates[2]
-            }
-        }
-
-        nextMenu?.let { nextMenuValue ->
-            val parts = nextMenuValue.split(" ")
-            val menuName = parts[0]
-            val newCoordinates = if (parts.size == 4) {
-                parts.subList(1, 4).mapNotNull { it.toIntOrNull() }
-            } else {
-                null
+            swap?.let {
+                val swapCoordinates = it.split(" ").mapNotNull { it.toIntOrNull() }
+                if (swapCoordinates.size == 3) {
+                    state.x = swapCoordinates[0]
+                    state.y = swapCoordinates[1]
+                    state.z = swapCoordinates[2]
+                }
             }
 
-            state.currentMenu = menuName
-
-            if (newCoordinates != null && newCoordinates.size == 3) {
-                state.x = newCoordinates[0]
-                state.y = newCoordinates[1]
-                state.z = newCoordinates[2]
-            } else {
-                val origin = plugin.configManager.customConfig.getConfigurationSection(menuName)
-                    ?.getString("origin", "0 0 0")
-                    ?.split(" ")
-                    ?.mapNotNull { it.toIntOrNull() }
-                    ?: listOf(0, 0, 0)
-
-                if (origin.size == 3) {
-                    state.x = origin[0]
-                    state.y = origin[1]
-                    state.z = origin[2]
+            nextMenu?.let { nextMenuValue ->
+                val parts = nextMenuValue.split(" ")
+                val menuName = parts[0]
+                val newCoordinates = if (parts.size == 4) {
+                    parts.subList(1, 4).mapNotNull { it.toIntOrNull() }
                 } else {
-                    state.x = 0
-                    state.y = 0
-                    state.z = 0
+                    null
+                }
+
+                state.currentMenu = menuName
+
+                if (newCoordinates != null && newCoordinates.size == 3) {
+                    state.x = newCoordinates[0]
+                    state.y = newCoordinates[1]
+                    state.z = newCoordinates[2]
+                } else {
+                    val origin = plugin.configManager.customConfig.getConfigurationSection(menuName)
+                        ?.getString("origin", "0 0 0")
+                        ?.split(" ")
+                        ?.mapNotNull { it.toIntOrNull() }
+                        ?: listOf(0, 0, 0)
+
+                    if (origin.size == 3) {
+                        state.x = origin[0]
+                        state.y = origin[1]
+                        state.z = origin[2]
+                    } else {
+                        state.x = 0
+                        state.y = 0
+                        state.z = 0
+                    }
                 }
             }
-        }
+        }, 5L)
     }
+
     fun executeCommand(command: String, player: Player, executionType: String) {
         Bukkit.getScheduler().runTask(plugin, Runnable {
             when (executionType) {

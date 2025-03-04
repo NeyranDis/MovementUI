@@ -17,7 +17,7 @@ import top.eternal.neyran.movementUI.managers.*
 import top.eternal.neyran.movementUI.utils.ChatUtils.toMiniMessageComponent
 
 class MovementsMain : JavaPlugin() {
-    var vers = "1.1.4"
+    var vers = "1.1.5"
     val playerStates: MutableMap<String, PlayerState> = mutableMapOf()
 
     lateinit var conditionsManager: ConditionManager
@@ -50,7 +50,7 @@ class MovementsMain : JavaPlugin() {
         logger.info(" \n" +
                 "  __  __                                     _   _    _ _____ \n" +
                 " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/3/3-15:51\n" +
+                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/3/4-18:38\n" +
                 " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
                 " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
                 " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
@@ -197,6 +197,7 @@ class MovementsMain : JavaPlugin() {
         if (nextMenu != null) {
             val nextMenuSection = configManager.customConfig.getConfigurationSection(nextMenu)
             val permission = nextMenuSection?.getString("permission")
+            val conditionsSection = nextMenuSection?.getConfigurationSection("menu_conditions")
 
             if (permission != null && !player.hasPermission(permission)) {
                 state.x = prevX
@@ -205,6 +206,17 @@ class MovementsMain : JavaPlugin() {
                 val message = (Component.text()
                     .append(configManager.langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
                     .append(configManager.langConfig.getString("no.permissions_menu")?.toMiniMessageComponent() ?: Component.text(""))
+                    .build())
+                player.sendMessage(message)
+                return
+            }
+            if (conditionsSection != null && !conditionsManager.evaluateConditions(conditionsSection, player)) {
+                state.x = prevX
+                state.y = prevY
+                state.z = prevZ
+                val message = (Component.text()
+                    .append(configManager.langConfig.getString("plugin.tag")?.toMiniMessageComponent() ?: Component.text(""))
+                    .append(configManager.langConfig.getString("no.menu_conditions")?.toMiniMessageComponent() ?: Component.text(""))
                     .build())
                 player.sendMessage(message)
                 return

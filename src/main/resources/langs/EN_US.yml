@@ -3,6 +3,7 @@ plugin.tag: "&d[MovementUI] "
 reload.command: "Configs reloaded!"
 no.permissions: "You don't have permission to use this command!"
 no.permissions_menu: "You don't have permission for this menu!"
+no.menu_conditions: "You cannot navigate to this menu!"
 
 player.not.found: "Player not found!"
 

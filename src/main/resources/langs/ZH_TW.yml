@@ -3,6 +3,7 @@ plugin.tag: "&d[MovementUI] "
 reload.command: "配置重新加載！"
 no.permissions: "您無權使用此命令!"
 no.permissions_menu: "您沒有使用此選單權限!"
+no.menu_conditions: "您無法進入該選單。!"
 
 player.not.found: "找不到玩家!"
 
