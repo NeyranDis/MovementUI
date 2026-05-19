@@ -60,8 +60,9 @@ class ExecutiveManager(private val plugin: MovementsMain) {
                 it.getKeys(false).forEach { key ->
                     val command = it.getString("$key.command")
                     val executionType = it.getString("$key.executionType") ?: "player"
+                    val delay = it.getLong("$key.delay", 0L).coerceAtLeast(0L)
                     if (command != null && plugin.conditionsManager.isCommandConditionMet(it.getConfigurationSection(key)!!, player)) {
-                        executeCommand(command, player, executionType)
+                        executeCommand(command, player, executionType, delay)
                     }
                 }
             }
@@ -111,8 +112,8 @@ class ExecutiveManager(private val plugin: MovementsMain) {
         }, 5L)
     }
 
-    fun executeCommand(command: String, player: Player, executionType: String) {
-        Bukkit.getScheduler().runTask(plugin, Runnable {
+    fun executeCommand(command: String, player: Player, executionType: String, delay: Long = 0L) {
+        val task = Runnable {
             when (executionType) {
                 "console" -> plugin.server.dispatchCommand(
                     plugin.server.consoleSender,
@@ -130,6 +131,12 @@ class ExecutiveManager(private val plugin: MovementsMain) {
                 }
                 else -> plugin.logger.warning("Unknown execution type: $executionType")
             }
-        })
+        }
+
+        if (delay > 0L) {
+            Bukkit.getScheduler().runTaskLater(plugin, task, delay)
+        } else {
+            Bukkit.getScheduler().runTask(plugin, task)
+        }
     }
 }

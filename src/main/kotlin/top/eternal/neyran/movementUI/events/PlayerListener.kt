@@ -11,12 +11,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryEvent
-import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.player.*
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryView
 import org.spigotmc.event.entity.EntityDismountEvent
 import top.eternal.neyran.movementUI.MovementsMain
 import top.eternal.neyran.movementUI.PlayerState

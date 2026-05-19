@@ -47,15 +47,16 @@ class MovementsMain : JavaPlugin() {
         Bukkit.getServicesManager().register(MovementUI_API::class.java, api, this, ServicePriority.Normal)
         configManager.loadLanguage()
         getCommand("movementui")?.setExecutor(CommandsManager(this))
-        logger.info(" \n" +
-                "  __  __                                     _   _    _ _____ \n" +
-                " |  \\/  |                                   | | | |  | |_   _|     MovementUI: ${vers}\n" +
-                " | \\  / | _____   _____ _ __ ___   ___ _ __ | |_| |  | | | |       Build Data: 2025/3/4-18:38\n" +
-                " | |\\/| |/ _ \\ \\ / / _ \\ '_ ` _ \\ / _ \\ '_ \\| __| |  | | | |       Author: Neyran\n" +
-                " | |  | | (_) \\ V /  __/ | | | | |  __/ | | | |_| |__| |_| |_ \n" +
-                " |_|  |_|\\___/ \\_/ \\___|_| |_| |_|\\___|_| |_|\\__|\\____/|_____|\n" +
-                "                                                              \n" +
-                "                                                              ")
+		logger.info(" \n" +
+				" _____                          _   _ _____ \n" +
+				"/  ___|                        | | | |_   _|     MovementUI: ${description.version}\n" +
+				"\\ `--.  ___ _ __ ___  ___ _ __ | | | | | |       Build Data: 2026/02/18-21:50\n" +
+				" `--. \\/ __| '__/ _ \\/ _ \\ '_ \\| | | | | |       Author: Neyran\n" +
+				"/\\__/ / (__| | |  __/  __/ | | | |_| |_| |_ \n" +
+				"\\____/ \\___|_|  \\___|\\___|_| |_|\\___/ \\___/ \n" +
+				"                                              \n" +
+				"                                              ");
+
     }
     override fun onDisable() {
         playerStates.clear()
